@@ -158,105 +158,112 @@
 
     // Função principal do fluxo: Buscar Info -> Mostrar Prévia -> Baixar Vídeo
     async function iniciarProcessamento() {
-        const videoUrl = videoUrlInput.value.trim();
+    // Obtém a URL e já remove espaços extras
+    let videoUrl = videoUrlInput.value.trim();
+    
+    // --- LIMPEZA DA URL: remove tudo após "?" (parâmetros) ---
+    if (videoUrl.includes('?')) {
+        videoUrl = videoUrl.split('?')[0];
+    }
+    
+    // --- Adiciona https:// se não tiver ---
+    if (!videoUrl.startsWith('http')) {
+        videoUrl = 'https://' + videoUrl;
+    }
+    // -------------------------------------------------------
 
-        if (!videoUrl) {
-            showError('Por favor, insira a URL do vídeo do TikTok.');
-            return;
-        }
-
-        const tiktokRegex = /^(https?:\/\/)?(www\.|vm\.)?tiktok\.com\/(@[\w.]+|t\/[\w]+|embed|v\/\d+)/i;
-        if (!tiktokRegex.test(videoUrl) && !videoUrl.includes('tiktok.com')) {
-            showError('URL inválida. Cole um link válido do TikTok (ex: https://www.tiktok.com/@user/video/123)');
-            return;
-        }
-
-        showLoading(true);
-        downloadBtn.disabled = true;
-        downloadBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processando...';
-
-        try {
-            // --- 1. Chamar o novo endpoint /info para obter título e capa ---
-            const infoEndpoint = `${API_BASE_URL}/info?url=${encodeURIComponent(videoUrl)}`;
-            const infoResponse = await fetch(infoEndpoint, {
-                method: 'GET',
-                headers: { 'X-API-Key': API_KEY }
-            });
-
-            if (!infoResponse.ok) {
-                let errorMsg = `Erro ${infoResponse.status}`;
-                if (infoResponse.status === 401) errorMsg = 'Chave de API inválida.';
-                if (infoResponse.status === 404) errorMsg = 'Vídeo não encontrado. Verifique a URL.';
-                throw new Error(errorMsg);
-            }
-
-            const infoData = await infoResponse.json();
-            const videoTitle = infoData.title;
-            const thumbnailUrl = infoData.thumbnail || 'https://placehold.co/400x600?text=Sem+Preview';
-
-            // --- 2. Mostrar a prévia do vídeo com os dados obtidos ---
-            showPreview(thumbnailUrl, videoTitle, async () => {
-                // Esta função será executada quando o usuário clicar em "Baixar vídeo" na prévia
-                const downloadBtnInPreview = document.getElementById('finalDownloadBtn');
-                if (downloadBtnInPreview) {
-                    downloadBtnInPreview.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Baixando...';
-                    downloadBtnInPreview.disabled = true;
-                }
-
-                try {
-                    // Chamar o endpoint de download
-                    const downloadEndpoint = `${API_BASE_URL}/download/video`;
-                    const downloadResponse = await fetch(downloadEndpoint, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-API-Key': API_KEY
-                        },
-                        body: JSON.stringify({ url: videoUrl })
-                    });
-
-                    if (!downloadResponse.ok) {
-                        let errorMsg = `Erro ${downloadResponse.status}`;
-                        if (downloadResponse.status === 400) errorMsg = 'URL inválida ou vídeo não encontrado.';
-                        throw new Error(errorMsg);
-                    }
-
-                    const blob = await downloadResponse.blob();
-                    const filename = sanitizeFilename(videoTitle) + ".mp4";
-                    const blobUrl = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = blobUrl;
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(blobUrl);
-
-                } catch (downloadError) {
-                    console.error(downloadError);
-                    showError(`Erro ao baixar: ${downloadError.message || 'Falha no download. Tente novamente.'}`);
-                } finally {
-                    if (downloadBtnInPreview) {
-                        downloadBtnInPreview.innerHTML = '<i class="fas fa-arrow-down"></i> Baixar vídeo';
-                        downloadBtnInPreview.disabled = false;
-                    }
-                }
-            });
-
-        } catch (infoError) {
-            console.error(infoError);
-            let userMsg = infoError.message || 'Falha ao obter informações do vídeo.';
-            if (userMsg.includes('Failed to fetch') || userMsg.includes('NetworkError')) {
-                userMsg = 'Erro de rede. Verifique sua conexão com a internet.';
-            }
-            showError(userMsg);
-        } finally {
-            showLoading(false);
-            downloadBtn.disabled = false;
-            downloadBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Baixar vídeo agora';
-        }
+    if (!videoUrl) {
+        showError('Por favor, insira a URL do vídeo do TikTok.');
+        return;
     }
 
+    const tiktokRegex = /^(https?:\/\/)?(www\.|vm\.)?tiktok\.com\/(@[\w.]+|t\/[\w]+|embed|v\/\d+)/i;
+    if (!tiktokRegex.test(videoUrl) && !videoUrl.includes('tiktok.com')) {
+        showError('URL inválida. Cole um link válido do TikTok (ex: https://www.tiktok.com/@user/video/123)');
+        return;
+    }
+
+    showLoading(true);
+    downloadBtn.disabled = true;
+    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processando...';
+
+    try {
+        const infoEndpoint = `${API_BASE_URL}/info?url=${encodeURIComponent(videoUrl)}`;
+        const infoResponse = await fetch(infoEndpoint, {
+            method: 'GET',
+            headers: { 'X-API-Key': API_KEY }
+        });
+
+        if (!infoResponse.ok) {
+            let errorMsg = `Erro ${infoResponse.status}`;
+            if (infoResponse.status === 401) errorMsg = 'Chave de API inválida.';
+            if (infoResponse.status === 404) errorMsg = 'Vídeo não encontrado. Verifique a URL.';
+            throw new Error(errorMsg);
+        }
+
+        const infoData = await infoResponse.json();
+        const videoTitle = infoData.title;
+        const thumbnailUrl = infoData.thumbnail || 'https://placehold.co/400x600?text=Sem+Preview';
+
+        showPreview(thumbnailUrl, videoTitle, async () => {
+            const downloadBtnInPreview = document.getElementById('finalDownloadBtn');
+            if (downloadBtnInPreview) {
+                downloadBtnInPreview.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Baixando...';
+                downloadBtnInPreview.disabled = true;
+            }
+
+            try {
+                const downloadEndpoint = `${API_BASE_URL}/download/video`;
+                const downloadResponse = await fetch(downloadEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': API_KEY
+                    },
+                    body: JSON.stringify({ url: videoUrl })
+                });
+
+                if (!downloadResponse.ok) {
+                    let errorMsg = `Erro ${downloadResponse.status}`;
+                    if (downloadResponse.status === 400) errorMsg = 'URL inválida ou vídeo não encontrado.';
+                    throw new Error(errorMsg);
+                }
+
+                const blob = await downloadResponse.blob();
+                const filename = sanitizeFilename(videoTitle) + ".mp4";
+                const blobUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+
+            } catch (downloadError) {
+                console.error(downloadError);
+                showError(`Erro ao baixar: ${downloadError.message || 'Falha no download. Tente novamente.'}`);
+            } finally {
+                if (downloadBtnInPreview) {
+                    downloadBtnInPreview.innerHTML = '<i class="fas fa-arrow-down"></i> Baixar vídeo';
+                    downloadBtnInPreview.disabled = false;
+                }
+            }
+        });
+
+    } catch (infoError) {
+        console.error(infoError);
+        let userMsg = infoError.message || 'Falha ao obter informações do vídeo.';
+        if (userMsg.includes('Failed to fetch') || userMsg.includes('NetworkError')) {
+            userMsg = 'Erro de rede. Verifique sua conexão com a internet.';
+        }
+        showError(userMsg);
+    } finally {
+        showLoading(false);
+        downloadBtn.disabled = false;
+        downloadBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Baixar vídeo agora';
+    }
+}
     downloadBtn.addEventListener('click', iniciarProcessamento);
     videoUrlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') iniciarProcessamento(); });
     videoUrlInput.addEventListener('focus', () => { if (resultArea.innerHTML.includes('error-message')) resultArea.innerHTML = ''; });
