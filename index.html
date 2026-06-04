@@ -10,293 +10,43 @@
     <!-- Google Fonts: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-        }
-
-        .container {
-            max-width: 880px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
-            border-radius: 2rem;
-            padding: 2rem;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff, #ffd6e0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-        }
-
-        .header p {
-            color: #e0e0e0;
-            margin-top: 8px;
-            font-weight: 400;
-        }
-
-        .badge {
-            display: inline-block;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 40px;
-            padding: 5px 12px;
-            font-size: 0.75rem;
-            color: #ccc;
-            margin-top: 12px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 1.5rem;
-            padding: 1.8rem;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            margin-bottom: 1.5rem;
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .input-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #1e1e2f;
-            font-size: 0.9rem;
-        }
-
-        .input-group label i {
-            margin-right: 8px;
-            color: #ff3b6f;
-        }
-
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-            background: #f1f5f9;
-            border-radius: 60px;
-            padding: 5px 15px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s;
-        }
-
-        .input-wrapper:focus-within {
-            border-color: #ff3b6f;
-            box-shadow: 0 0 0 3px rgba(255, 59, 111, 0.2);
-            background: white;
-        }
-
-        .input-wrapper i {
-            color: #94a3b8;
-            font-size: 1.1rem;
-        }
-
-        .input-wrapper input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            padding: 14px 12px;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            outline: none;
-        }
-
-        .btn-download {
-            background: linear-gradient(95deg, #ff3b6f, #fd1d1d);
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 60px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 8px 18px rgba(253, 29, 29, 0.3);
-        }
-
-        .btn-download:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 22px rgba(253, 29, 29, 0.4);
-        }
-
-        .btn-download:disabled {
-            opacity: 0.6;
-            transform: none;
-            cursor: not-allowed;
-        }
-
-        /* Botão flutuante no canto inferior direito */
-        .btn-api-float {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: #0f172a;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 60px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-api-float:hover {
-            background: #ff3b6f;
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px rgba(255, 59, 111, 0.4);
-        }
-
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            color: #1e1e2f;
-            padding: 20px;
-            font-weight: 500;
-            background: rgba(255,255,255,0.9);
-            border-radius: 60px;
-            margin-top: 1rem;
-        }
-
-        .spinner {
-            width: 28px;
-            height: 28px;
-            border: 3px solid rgba(0,0,0,0.1);
-            border-top: 3px solid #ff3b6f;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .result-card {
-            background: white;
-            border-radius: 1.5rem;
-            overflow: hidden;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-            margin-top: 1rem;
-            animation: fadeInUp 0.4s ease;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .btn-save {
-            background: #0f172a;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 40px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 12px;
-        }
-
-        .btn-save:hover {
-            background: #ff3b6f;
-            transform: scale(1.02);
-        }
-
-        .error-message {
-            background: #fee2e2;
-            color: #b91c1c;
-            padding: 14px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin: 1rem 0 0;
-            text-align: center;
-        }
-
-        .success-message {
-            background: #e0f2fe;
-            color: #0f172a;
-            padding: 14px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin: 1rem 0 0;
-            text-align: center;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 2rem;
-            font-size: 0.75rem;
-            color: #aaa;
-        }
-
-        @media (max-width: 640px) {
-            .container {
-                padding: 1rem;
-            }
-            .card {
-                padding: 1.2rem;
-            }
-            .btn-api-float {
-                padding: 10px 18px;
-                font-size: 0.8rem;
-                bottom: 16px;
-                right: 16px;
-            }
-        }
+        /* --- SEUS ESTILOS AQUI (MANTENHA OS MESMOS) --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; position: relative; }
+        .container { max-width: 880px; width: 100%; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border-radius: 2rem; padding: 2rem; box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s ease; }
+        .header { text-align: center; margin-bottom: 2rem; }
+        .header h1 { font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, #fff, #ffd6e0); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -0.5px; }
+        .header p { color: #e0e0e0; margin-top: 8px; font-weight: 400; }
+        .card { background: rgba(255, 255, 255, 0.95); border-radius: 1.5rem; padding: 1.8rem; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); margin-bottom: 1.5rem; }
+        .input-group { margin-bottom: 1.5rem; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #1e1e2f; font-size: 0.9rem; }
+        .input-group label i { margin-right: 8px; color: #ff3b6f; }
+        .input-wrapper { display: flex; align-items: center; background: #f1f5f9; border-radius: 60px; padding: 5px 15px; border: 1px solid #e2e8f0; transition: all 0.2s; }
+        .input-wrapper:focus-within { border-color: #ff3b6f; box-shadow: 0 0 0 3px rgba(255, 59, 111, 0.2); background: white; }
+        .input-wrapper i { color: #94a3b8; font-size: 1.1rem; }
+        .input-wrapper input { flex: 1; border: none; background: transparent; padding: 14px 12px; font-size: 1rem; font-family: 'Poppins', sans-serif; outline: none; }
+        .btn-download { background: linear-gradient(95deg, #ff3b6f, #fd1d1d); border: none; width: 100%; padding: 14px; border-radius: 60px; font-size: 1.1rem; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 18px rgba(253, 29, 29, 0.3); }
+        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(253, 29, 29, 0.4); }
+        .btn-download:disabled { opacity: 0.6; transform: none; cursor: not-allowed; }
+        .btn-api-float { position: fixed; bottom: 24px; right: 24px; background: #0f172a; border: none; padding: 14px 24px; border-radius: 60px; font-size: 0.9rem; font-weight: 600; color: white; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); z-index: 1000; backdrop-filter: blur(4px); background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .btn-api-float:hover { background: #ff3b6f; transform: translateY(-3px); box-shadow: 0 12px 24px rgba(255, 59, 111, 0.4); }
+        .loading { display: flex; justify-content: center; align-items: center; gap: 12px; color: #1e1e2f; padding: 20px; font-weight: 500; background: rgba(255,255,255,0.9); border-radius: 60px; margin-top: 1rem; }
+        .spinner { width: 28px; height: 28px; border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid #ff3b6f; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .result-card { background: white; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 15px 30px rgba(0,0,0,0.15); margin-top: 1rem; animation: fadeInUp 0.4s ease; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .video-preview { display: flex; flex-wrap: wrap; gap: 20px; padding: 1.5rem; border-bottom: 1px solid #edf2f7; }
+        .thumbnail { flex-shrink: 0; width: 140px; height: 200px; border-radius: 18px; overflow: hidden; background: #f1f5f9; box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+        .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+        .info { flex: 1; }
+        .info h3 { font-size: 1.3rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; word-break: break-word; }
+        .info h3 i { color: #ff3b6f; }
+        .info p { color: #475569; font-size: 0.85rem; margin-bottom: 16px; }
+        .btn-save { background: #0f172a; border: none; padding: 12px 28px; border-radius: 40px; color: white; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; }
+        .btn-save:hover { background: #ff3b6f; transform: scale(1.02); }
+        .error-message { background: #fee2e2; color: #b91c1c; padding: 14px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; margin: 1rem 0 0; text-align: center; }
+        footer { text-align: center; margin-top: 2rem; font-size: 0.75rem; color: #aaa; }
+        @media (max-width: 640px) { .container { padding: 1rem; } .card { padding: 1.2rem; } .video-preview { flex-direction: column; align-items: center; text-align: center; } .info h3 { justify-content: center; } .thumbnail { width: 120px; height: 170px; } .btn-api-float { padding: 10px 18px; font-size: 0.8rem; bottom: 16px; right: 16px; } }
     </style>
 </head>
 <body>
@@ -337,24 +87,18 @@
     const API_BASE_URL = "https://api-tiktok-pc0800.onrender.com";
     const API_KEY = "7x9K!mQ2@zLp#wR4";   // Sua chave definida no Render
 
-    // Link para a documentação interativa da sua API
     const API_DOCS_URL = API_BASE_URL + "/docs";
 
-    // DOM elements
     const videoUrlInput = document.getElementById('videoUrl');
     const downloadBtn = document.getElementById('downloadBtn');
     const resultArea = document.getElementById('resultArea');
     const apiDocsBtn = document.getElementById('apiDocsBtn');
 
-    // Evento para abrir a documentação da sua API
     if (apiDocsBtn) {
-        apiDocsBtn.addEventListener('click', () => {
-            window.open(API_DOCS_URL, '_blank');
-        });
+        apiDocsBtn.addEventListener('click', () => window.open(API_DOCS_URL, '_blank'));
     }
 
-    // Mostrar loading
-    function showLoading(show, message = "Processando vídeo...") {
+    function showLoading(show, message = "Buscando informações do vídeo...") {
         if (show) {
             resultArea.innerHTML = `<div class="loading"><div class="spinner"></div><span>${message}</span></div>`;
         } else {
@@ -368,18 +112,25 @@
         resultArea.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
     }
 
-    function showSuccess(title, downloadCallback) {
+    // Função para mostrar a prévia do vídeo após obter as informações
+    function showPreview(thumbnailUrl, videoTitle, downloadHandler) {
         resultArea.innerHTML = `
             <div class="result-card" id="resultCard">
-                <i class="fab fa-tiktok" style="font-size: 2.5rem; color: #ff3b6f;"></i>
-                <h3 style="margin-top: 8px;">Vídeo pronto para download</h3>
-                <p>${escapeHtml(title) || "Seu vídeo foi processado com sucesso!"}</p>
-                <button class="btn-save" id="finalDownloadBtn"><i class="fas fa-arrow-down"></i> Baixar vídeo</button>
+                <div class="video-preview">
+                    <div class="thumbnail">
+                        <img src="${thumbnailUrl}" alt="thumbnail" referrerpolicy="no-referrer" onerror="this.src='https://placehold.co/400x600?text=Sem+Preview'">
+                    </div>
+                    <div class="info">
+                        <h3><i class="fab fa-tiktok"></i> ${escapeHtml(videoTitle)}</h3>
+                        <p><i class="fas fa-download"></i> Clique no botão abaixo para salvar o vídeo em alta qualidade (sem marca d'água)</p>
+                        <button class="btn-save" id="finalDownloadBtn"><i class="fas fa-arrow-down"></i> Baixar vídeo</button>
+                    </div>
+                </div>
             </div>
         `;
         const finalBtn = document.getElementById('finalDownloadBtn');
-        if (finalBtn && downloadCallback) {
-            finalBtn.addEventListener('click', downloadCallback);
+        if (finalBtn && downloadHandler) {
+            finalBtn.addEventListener('click', downloadHandler);
         }
         document.getElementById('resultCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -394,34 +145,19 @@
         });
     }
 
-    // Função para extrair nome do arquivo do header Content-Disposition ou gerar um nome padrão
-    function extractFilenameFromHeaders(contentDisposition, fallbackTitle = "tiktok_video") {
-        if (contentDisposition && contentDisposition.includes('filename=')) {
-            let match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-            if (match && match[1]) {
-                let filename = match[1].replace(/['"]/g, '');
-                return filename;
-            }
-        }
-        // Gera nome com timestamp
-        const safeTitle = fallbackTitle.replace(/[\\/*?:"<>|]/g, '').trim() || "tiktok_video";
-        return `${safeTitle}.mp4`;
+    // Função para sanitizar nome de arquivo
+    function sanitizeFilename(name) {
+        if (!name) return "tiktok_video";
+        let clean = name.replace(/<[^>]*>/g, '');
+        clean = clean.replace(/[\\/*?:"<>|]/g, '');
+        clean = clean.replace(/[^\w\s\u00C0-\u024F\u1E00-\u1EFF\-\.]/g, '');
+        clean = clean.trim().replace(/\s+/g, ' ');
+        if (clean.length > 80) clean = clean.substring(0, 80);
+        return clean || "tiktok_video";
     }
 
-    // Download via blob com nome correto
-    async function downloadBlob(blob, filename) {
-        const blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
-    }
-
-    // Função principal: chamar sua API e baixar o vídeo
-    async function fetchTikTokVideo() {
+    // Função principal do fluxo: Buscar Info -> Mostrar Prévia -> Baixar Vídeo
+    async function iniciarProcessamento() {
         const videoUrl = videoUrlInput.value.trim();
 
         if (!videoUrl) {
@@ -440,56 +176,76 @@
         downloadBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processando...';
 
         try {
-            const endpoint = `${API_BASE_URL}/download/video`;
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': API_KEY
-                },
-                body: JSON.stringify({ url: videoUrl })
+            // --- 1. Chamar o novo endpoint /info para obter título e capa ---
+            const infoEndpoint = `${API_BASE_URL}/info?url=${encodeURIComponent(videoUrl)}`;
+            const infoResponse = await fetch(infoEndpoint, {
+                method: 'GET',
+                headers: { 'X-API-Key': API_KEY }
             });
 
-            if (!response.ok) {
-                let errorText = `Erro ${response.status}`;
-                if (response.status === 401) errorText = 'Chave de API inválida. Contate o administrador.';
-                else if (response.status === 403) errorText = 'Acesso negado. Verifique sua chave de API.';
-                else if (response.status === 400) errorText = 'URL inválida ou vídeo não encontrado.';
-                else if (response.status === 429) errorText = 'Muitas requisições. Tente mais tarde.';
-                else if (response.status >= 500) errorText = 'Erro interno no servidor. Tente novamente.';
-                throw new Error(errorText);
+            if (!infoResponse.ok) {
+                let errorMsg = `Erro ${infoResponse.status}`;
+                if (infoResponse.status === 401) errorMsg = 'Chave de API inválida.';
+                if (infoResponse.status === 404) errorMsg = 'Vídeo não encontrado. Verifique a URL.';
+                throw new Error(errorMsg);
             }
 
-            // Sucesso: obter o blob do vídeo
-            const blob = await response.blob();
-            const contentDisposition = response.headers.get('Content-Disposition');
-            // Tenta extrair título da URL original (fallback)
-            let titleFromUrl = "TikTok_Video";
-            try {
-                const urlObj = new URL(videoUrl);
-                const pathParts = urlObj.pathname.split('/');
-                const videoId = pathParts[pathParts.length - 1] || "video";
-                titleFromUrl = `tiktok_${videoId}`;
-            } catch(e) { /* ignora */ }
-            const filename = extractFilenameFromHeaders(contentDisposition, titleFromUrl);
+            const infoData = await infoResponse.json();
+            const videoTitle = infoData.title;
+            const thumbnailUrl = infoData.thumbnail || 'https://placehold.co/400x600?text=Sem+Preview';
 
-            // Exibir área de sucesso com botão de download
-            showSuccess(`Vídeo pronto: ${filename}`, async () => {
-                const finalBtn = document.getElementById('finalDownloadBtn');
-                if (finalBtn) {
-                    finalBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Baixando...';
-                    finalBtn.disabled = true;
+            // --- 2. Mostrar a prévia do vídeo com os dados obtidos ---
+            showPreview(thumbnailUrl, videoTitle, async () => {
+                // Esta função será executada quando o usuário clicar em "Baixar vídeo" na prévia
+                const downloadBtnInPreview = document.getElementById('finalDownloadBtn');
+                if (downloadBtnInPreview) {
+                    downloadBtnInPreview.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Baixando...';
+                    downloadBtnInPreview.disabled = true;
                 }
-                await downloadBlob(blob, filename);
-                if (finalBtn) {
-                    finalBtn.innerHTML = '<i class="fas fa-arrow-down"></i> Baixar vídeo';
-                    finalBtn.disabled = false;
+
+                try {
+                    // Chamar o endpoint de download
+                    const downloadEndpoint = `${API_BASE_URL}/download/video`;
+                    const downloadResponse = await fetch(downloadEndpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-API-Key': API_KEY
+                        },
+                        body: JSON.stringify({ url: videoUrl })
+                    });
+
+                    if (!downloadResponse.ok) {
+                        let errorMsg = `Erro ${downloadResponse.status}`;
+                        if (downloadResponse.status === 400) errorMsg = 'URL inválida ou vídeo não encontrado.';
+                        throw new Error(errorMsg);
+                    }
+
+                    const blob = await downloadResponse.blob();
+                    const filename = sanitizeFilename(videoTitle) + ".mp4";
+                    const blobUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(blobUrl);
+
+                } catch (downloadError) {
+                    console.error(downloadError);
+                    showError(`Erro ao baixar: ${downloadError.message || 'Falha no download. Tente novamente.'}`);
+                } finally {
+                    if (downloadBtnInPreview) {
+                        downloadBtnInPreview.innerHTML = '<i class="fas fa-arrow-down"></i> Baixar vídeo';
+                        downloadBtnInPreview.disabled = false;
+                    }
                 }
             });
 
-        } catch (error) {
-            console.error(error);
-            let userMsg = error.message || 'Falha ao processar o download. Verifique a URL.';
+        } catch (infoError) {
+            console.error(infoError);
+            let userMsg = infoError.message || 'Falha ao obter informações do vídeo.';
             if (userMsg.includes('Failed to fetch') || userMsg.includes('NetworkError')) {
                 userMsg = 'Erro de rede. Verifique sua conexão com a internet.';
             }
@@ -501,20 +257,9 @@
         }
     }
 
-    downloadBtn.addEventListener('click', fetchTikTokVideo);
-
-    // Permitir tecla Enter no campo de URL
-    videoUrlInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            fetchTikTokVideo();
-        }
-    });
-
-    // Limpar mensagens de erro ao focar no campo
-    videoUrlInput.addEventListener('focus', () => {
-        if (resultArea.innerHTML.includes('error-message')) resultArea.innerHTML = '';
-    });
+    downloadBtn.addEventListener('click', iniciarProcessamento);
+    videoUrlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') iniciarProcessamento(); });
+    videoUrlInput.addEventListener('focus', () => { if (resultArea.innerHTML.includes('error-message')) resultArea.innerHTML = ''; });
 </script>
 </body>
 </html>
