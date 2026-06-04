@@ -10,10 +10,9 @@
     <!-- Google Fonts: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- ESTILOS (mantidos iguais aos seus) --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; position: relative; }
-        .container { max-width: 880px; width: 100%; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border-radius: 2rem; padding: 2rem; box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s ease; }
+        .container { max-width: 880px; width: 100%; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border-radius: 2rem; padding: 2rem; box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); }
         .header { text-align: center; margin-bottom: 2rem; }
         .header h1 { font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, #fff, #ffd6e0); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -0.5px; }
         .header p { color: #e0e0e0; margin-top: 8px; font-weight: 400; }
@@ -23,8 +22,7 @@
         .input-group label i { margin-right: 8px; color: #ff3b6f; }
         .input-wrapper { display: flex; align-items: center; background: #f1f5f9; border-radius: 60px; padding: 5px 15px; border: 1px solid #e2e8f0; transition: all 0.2s; }
         .input-wrapper:focus-within { border-color: #ff3b6f; box-shadow: 0 0 0 3px rgba(255, 59, 111, 0.2); background: white; }
-        .input-wrapper i { color: #94a3b8; font-size: 1.1rem; }
-        .input-wrapper input { flex: 1; border: none; background: transparent; padding: 14px 12px; font-size: 1rem; font-family: 'Poppins', sans-serif; outline: none; }
+        .input-wrapper input, .input-wrapper select { flex: 1; border: none; background: transparent; padding: 14px 12px; font-size: 1rem; font-family: 'Poppins', sans-serif; outline: none; width: 100%; }
         .btn-download { background: linear-gradient(95deg, #ff3b6f, #fd1d1d); border: none; width: 100%; padding: 14px; border-radius: 60px; font-size: 1.1rem; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 18px rgba(253, 29, 29, 0.3); }
         .btn-download:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(253, 29, 29, 0.4); }
         .btn-download:disabled { opacity: 0.6; transform: none; cursor: not-allowed; }
@@ -47,6 +45,8 @@
         .error-message { background: #fee2e2; color: #b91c1c; padding: 14px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; margin: 1rem 0 0; text-align: center; }
         footer { text-align: center; margin-top: 2rem; font-size: 0.75rem; color: #aaa; }
         @media (max-width: 640px) { .container { padding: 1rem; } .card { padding: 1.2rem; } .video-preview { flex-direction: column; align-items: center; text-align: center; } .info h3 { justify-content: center; } .thumbnail { width: 120px; height: 170px; } .btn-api-float { padding: 10px 18px; font-size: 0.8rem; bottom: 16px; right: 16px; } }
+        .quality-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .quality-item { flex: 1; min-width: 160px; }
     </style>
 </head>
 <body>
@@ -65,6 +65,28 @@
             </div>
         </div>
 
+        <div class="quality-row">
+            <div class="quality-item">
+                <label><i class="fas fa-video"></i> Qualidade do vídeo</label>
+                <select id="videoQuality" class="input-wrapper">
+                    <option value="1080p" selected>1080p</option>
+                    <option value="720p">720p</option>
+                    <option value="480p">480p</option>
+                    <option value="2k">2K (1440p)</option>
+                    <option value="4k">4K (2160p)</option>
+                </select>
+            </div>
+            <div class="quality-item">
+                <label><i class="fas fa-music"></i> Qualidade do áudio (MP3)</label>
+                <select id="audioQuality" class="input-wrapper">
+                    <option value="128kbps" selected>128 kbps</option>
+                    <option value="64kbps">64 kbps</option>
+                    <option value="256kbps">256 kbps</option>
+                    <option value="320kbps">320 kbps</option>
+                </select>
+            </div>
+        </div>
+
         <button class="btn-download" id="downloadBtn"><i class="fas fa-cloud-download-alt"></i> Baixar vídeo agora</button>
     </div>
 
@@ -75,7 +97,6 @@
     </footer>
 </div>
 
-<!-- Botão flutuante -->
 <button class="btn-api-float" id="apiDocsBtn">
     <i class="fas fa-book-open"></i> Documentação da API
 </button>
@@ -85,10 +106,12 @@
     // CONFIGURAÇÃO DA API
     // ============================================================
     const API_BASE_URL = "https://api-tiktok-pc0800.onrender.com";
-    const API_KEY = "7x9K!mQ2@zLp#wR4";   // Sua chave
+    const API_KEY = "7x9K!mQ2@zLp#wR4";
     const API_DOCS_URL = API_BASE_URL + "/docs";
 
     const videoUrlInput = document.getElementById('videoUrl');
+    const videoQualitySelect = document.getElementById('videoQuality');
+    const audioQualitySelect = document.getElementById('audioQuality');
     const downloadBtn = document.getElementById('downloadBtn');
     const resultArea = document.getElementById('resultArea');
     const apiDocsBtn = document.getElementById('apiDocsBtn');
@@ -97,7 +120,6 @@
         apiDocsBtn.addEventListener('click', () => window.open(API_DOCS_URL, '_blank'));
     }
 
-    // Função para escapar caracteres HTML
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, function(m) {
@@ -122,7 +144,6 @@
         resultArea.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
     }
 
-    // Função para mostrar a prévia com dois botões (vídeo e áudio)
     function showPreview(thumbnailUrl, videoTitle, videoDownloadHandler, audioDownloadHandler) {
         resultArea.innerHTML = `
             <div class="result-card" id="resultCard">
@@ -160,14 +181,8 @@
 
     async function iniciarProcessamento() {
         let videoUrl = videoUrlInput.value.trim();
-        
-        // Limpeza da URL: remove parâmetros após '?' e adiciona https://
-        if (videoUrl.includes('?')) {
-            videoUrl = videoUrl.split('?')[0];
-        }
-        if (!videoUrl.startsWith('http')) {
-            videoUrl = 'https://' + videoUrl;
-        }
+        if (videoUrl.includes('?')) videoUrl = videoUrl.split('?')[0];
+        if (!videoUrl.startsWith('http')) videoUrl = 'https://' + videoUrl;
 
         if (!videoUrl) {
             showError('Por favor, insira a URL do vídeo do TikTok.');
@@ -175,10 +190,13 @@
         }
 
         const tiktokRegex = /^(https?:\/\/)?(www\.|vm\.)?tiktok\.com\/(@[\w.]+|t\/[\w]+|embed|v\/\d+)/i;
-        if (!tiktokRegex.test(videoUrl) && !videoUrl.includes('tiktok.com')) {
+        if (!tiktokRegex.test(videoUrl)) {
             showError('URL inválida. Cole um link válido do TikTok.');
             return;
         }
+
+        const selectedVideoQuality = videoQualitySelect.value;
+        const selectedAudioQuality = audioQualitySelect.value;
 
         showLoading(true);
         downloadBtn.disabled = true;
@@ -190,103 +208,72 @@
                 method: 'GET',
                 headers: { 'X-API-Key': API_KEY }
             });
-            if (!infoResponse.ok) {
-                let errorMsg = `Erro ${infoResponse.status}`;
-                if (infoResponse.status === 401) errorMsg = 'Chave de API inválida.';
-                if (infoResponse.status === 404) errorMsg = 'Vídeo não encontrado. Verifique a URL.';
-                throw new Error(errorMsg);
-            }
-
+            if (!infoResponse.ok) throw new Error(`Erro ${infoResponse.status}`);
             const infoData = await infoResponse.json();
             const videoTitle = infoData.title;
             const thumbnailUrl = infoData.thumbnail || 'https://placehold.co/400x600?text=Sem+Preview';
 
-            // ========== HANDLER PARA VÍDEO (MP4) ==========
+            // Handler para download de vídeo (usa qualidade escolhida)
             const videoDownloadHandler = async () => {
-                const videoBtn = document.getElementById('finalDownloadBtnVideo');
-                if (videoBtn) {
-                    videoBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Baixando vídeo...';
-                    videoBtn.disabled = true;
-                }
+                const btn = document.getElementById('finalDownloadBtnVideo');
+                if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Baixando vídeo...'; btn.disabled = true; }
                 try {
-                    const downloadEndpoint = `${API_BASE_URL}/download/video`;
-                    const downloadResponse = await fetch(downloadEndpoint, {
+                    const response = await fetch(`${API_BASE_URL}/download/video`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-API-Key': API_KEY
-                        },
-                        body: JSON.stringify({ url: videoUrl })
+                        headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY },
+                        body: JSON.stringify({ url: videoUrl, video_quality: selectedVideoQuality })
                     });
-                    if (!downloadResponse.ok) throw new Error(`Erro ${downloadResponse.status}`);
-                    const blob = await downloadResponse.blob();
+                    if (!response.ok) throw new Error(`Erro ${response.status}`);
+                    const blob = await response.blob();
                     const filename = sanitizeFilename(videoTitle) + ".mp4";
                     const blobUrl = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = blobUrl;
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
                     URL.revokeObjectURL(blobUrl);
                 } catch (err) {
                     showError(`Erro ao baixar vídeo: ${err.message}`);
                 } finally {
-                    if (videoBtn) {
-                        videoBtn.innerHTML = '<i class="fas fa-video"></i> Baixar vídeo (MP4)';
-                        videoBtn.disabled = false;
-                    }
+                    if (btn) { btn.innerHTML = '<i class="fas fa-video"></i> Baixar vídeo (MP4)'; btn.disabled = false; }
                 }
             };
 
-            // ========== HANDLER PARA ÁUDIO (MP3) ==========
+            // Handler para download de áudio (usa qualidade escolhida)
             const audioDownloadHandler = async () => {
-                const audioBtn = document.getElementById('finalDownloadBtnAudio');
-                if (audioBtn) {
-                    audioBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processando áudio...';
-                    audioBtn.disabled = true;
-                }
+                const btn = document.getElementById('finalDownloadBtnAudio');
+                if (btn) { btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processando áudio...'; btn.disabled = true; }
                 try {
-                    const downloadEndpoint = `${API_BASE_URL}/download/audio`;
-                    const downloadResponse = await fetch(downloadEndpoint, {
+                    const response = await fetch(`${API_BASE_URL}/download/audio`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-API-Key': API_KEY
-                        },
-                        body: JSON.stringify({ url: videoUrl })
+                        headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY },
+                        body: JSON.stringify({ url: videoUrl, audio_quality: selectedAudioQuality })
                     });
-                    if (!downloadResponse.ok) throw new Error(`Erro ${downloadResponse.status}`);
-                    const blob = await downloadResponse.blob();
+                    if (!response.ok) throw new Error(`Erro ${response.status}`);
+                    const blob = await response.blob();
                     const filename = sanitizeFilename(videoTitle) + ".mp3";
                     const blobUrl = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = blobUrl;
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
                     URL.revokeObjectURL(blobUrl);
                 } catch (err) {
                     showError(`Erro ao baixar áudio: ${err.message}`);
                 } finally {
-                    if (audioBtn) {
-                        audioBtn.innerHTML = '<i class="fas fa-music"></i> Baixar áudio (MP3)';
-                        audioBtn.disabled = false;
-                    }
+                    if (btn) { btn.innerHTML = '<i class="fas fa-music"></i> Baixar áudio (MP3)'; btn.disabled = false; }
                 }
             };
 
-            // Exibe a prévia com os dois botões
             showPreview(thumbnailUrl, videoTitle, videoDownloadHandler, audioDownloadHandler);
 
-        } catch (infoError) {
-            console.error(infoError);
-            let userMsg = infoError.message || 'Falha ao obter informações do vídeo.';
-            if (userMsg.includes('Failed to fetch') || userMsg.includes('NetworkError')) {
-                userMsg = 'Erro de rede. Verifique sua conexão com a internet.';
-            }
-            showError(userMsg);
+        } catch (err) {
+            console.error(err);
+            showError(err.message || 'Falha ao obter informações do vídeo.');
         } finally {
             showLoading(false);
             downloadBtn.disabled = false;
