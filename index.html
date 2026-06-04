@@ -218,6 +218,8 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.15);
             margin-top: 1rem;
             animation: fadeInUp 0.4s ease;
+            padding: 1.5rem;
+            text-align: center;
         }
 
         @keyframes fadeInUp {
@@ -229,55 +231,6 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-
-        .video-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            padding: 1.5rem;
-            border-bottom: 1px solid #edf2f7;
-        }
-
-        .thumbnail {
-            flex-shrink: 0;
-            width: 140px;
-            height: 200px;
-            border-radius: 18px;
-            overflow: hidden;
-            background: #f1f5f9;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-
-        .thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .info {
-            flex: 1;
-        }
-
-        .info h3 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            word-break: break-word;
-        }
-
-        .info h3 i {
-            color: #ff3b6f;
-        }
-
-        .info p {
-            color: #475569;
-            font-size: 0.85rem;
-            margin-bottom: 16px;
         }
 
         .btn-save {
@@ -293,6 +246,7 @@
             gap: 10px;
             cursor: pointer;
             transition: all 0.2s;
+            margin-top: 12px;
         }
 
         .btn-save:hover {
@@ -311,6 +265,17 @@
             text-align: center;
         }
 
+        .success-message {
+            background: #e0f2fe;
+            color: #0f172a;
+            padding: 14px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 1rem 0 0;
+            text-align: center;
+        }
+
         footer {
             text-align: center;
             margin-top: 2rem;
@@ -324,18 +289,6 @@
             }
             .card {
                 padding: 1.2rem;
-            }
-            .video-preview {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            .info h3 {
-                justify-content: center;
-            }
-            .thumbnail {
-                width: 120px;
-                height: 170px;
             }
             .btn-api-float {
                 padding: 10px 18px;
@@ -373,38 +326,39 @@
 </div>
 
 <!-- Botão flutuante no canto inferior direito -->
-<button class="btn-api-float" id="apiGuideBtn">
-    <i class="fas fa-question-circle"></i> Onde encontrar a minha API?
+<button class="btn-api-float" id="apiDocsBtn">
+    <i class="fas fa-book-open"></i> Documentação da API
 </button>
 
 <script>
     // ============================================================
-    // CHAVE DA API INTEGRADA DIRETAMENTE
+    // CONFIGURAÇÃO DA SUA PRÓPRIA API
     // ============================================================
-    const API_KEY = "f3ed166634msh47cae4b0abab658p13a2e7jsnfd7ddf30ff8c";
-    
-    // Link para guia da API (RapidAPI)
-    const API_GUIDE_URL = "https://rapidapi.com/elisbushaj2/api/tiktok-video-downloader-api/playground/apiendpoint_190e8489-6a0c-4853-a733-56c29e438540";
-    
+    const API_BASE_URL = "https://api-tiktok-pc0800.onrender.com";
+    const API_KEY = "7x9K!mQ2@zLp#wR4";   // Sua chave definida no Render
+
+    // Link para a documentação interativa da sua API
+    const API_DOCS_URL = API_BASE_URL + "/docs";
+
     // DOM elements
     const videoUrlInput = document.getElementById('videoUrl');
     const downloadBtn = document.getElementById('downloadBtn');
     const resultArea = document.getElementById('resultArea');
-    const apiGuideBtn = document.getElementById('apiGuideBtn');
+    const apiDocsBtn = document.getElementById('apiDocsBtn');
 
-    // Evento para abrir o link em nova aba
-    if (apiGuideBtn) {
-        apiGuideBtn.addEventListener('click', () => {
-            window.open(API_GUIDE_URL, '_blank');
+    // Evento para abrir a documentação da sua API
+    if (apiDocsBtn) {
+        apiDocsBtn.addEventListener('click', () => {
+            window.open(API_DOCS_URL, '_blank');
         });
     }
 
     // Mostrar loading
-    function showLoading(show, message = "Obtendo informações do vídeo...") {
+    function showLoading(show, message = "Processando vídeo...") {
         if (show) {
             resultArea.innerHTML = `<div class="loading"><div class="spinner"></div><span>${message}</span></div>`;
-        } else if (!show && resultArea.innerHTML.includes('loading')) {
-            if(resultArea.firstChild && resultArea.firstChild.classList && resultArea.firstChild.classList.contains('loading')) {
+        } else {
+            if (resultArea.firstChild && resultArea.firstChild.classList && resultArea.firstChild.classList.contains('loading')) {
                 resultArea.innerHTML = '';
             }
         }
@@ -414,58 +368,59 @@
         resultArea.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
     }
 
-    // Função para limpar tags HTML e emojis problemáticos (manter texto legível)
-    function cleanTitle(title) {
-        if (!title) return "TikTok Video";
-        // Remove tags HTML
-        let clean = title.replace(/<[^>]*>/g, '');
-        // Remove caracteres de controle e emojis? Vamos deixar a maioria, mas substituir alguns problemáticos para nome de arquivo
-        // Mas para exibição, queremos o texto original sem tags
-        return clean.trim() || "TikTok Video";
+    function showSuccess(title, downloadCallback) {
+        resultArea.innerHTML = `
+            <div class="result-card" id="resultCard">
+                <i class="fab fa-tiktok" style="font-size: 2.5rem; color: #ff3b6f;"></i>
+                <h3 style="margin-top: 8px;">Vídeo pronto para download</h3>
+                <p>${escapeHtml(title) || "Seu vídeo foi processado com sucesso!"}</p>
+                <button class="btn-save" id="finalDownloadBtn"><i class="fas fa-arrow-down"></i> Baixar vídeo</button>
+            </div>
+        `;
+        const finalBtn = document.getElementById('finalDownloadBtn');
+        if (finalBtn && downloadCallback) {
+            finalBtn.addEventListener('click', downloadCallback);
+        }
+        document.getElementById('resultCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // Função para sanitizar nome de arquivo (remove caracteres inválidos para Windows/Linux)
-    function sanitizeFilename(name) {
-        if (!name) return "tiktok_video";
-        // Remove tags HTML
-        let clean = name.replace(/<[^>]*>/g, '');
-        // Remove caracteres proibidos em nomes de arquivo: \ / : * ? " < > | e também control chars
-        clean = clean.replace(/[\\/*?:"<>|]/g, '');
-        // Remove emojis? Vamos manter caracteres alfanuméricos, espaços, hífens e underscores
-        clean = clean.replace(/[^\w\s\u00C0-\u024F\u1E00-\u1EFF\-\.]/g, '');
-        // Remove espaços extras
-        clean = clean.trim().replace(/\s+/g, ' ');
-        // Limita tamanho
-        if (clean.length > 80) clean = clean.substring(0, 80);
-        return clean || "tiktok_video";
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Função para extrair nome do arquivo do header Content-Disposition ou gerar um nome padrão
+    function extractFilenameFromHeaders(contentDisposition, fallbackTitle = "tiktok_video") {
+        if (contentDisposition && contentDisposition.includes('filename=')) {
+            let match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+            if (match && match[1]) {
+                let filename = match[1].replace(/['"]/g, '');
+                return filename;
+            }
+        }
+        // Gera nome com timestamp
+        const safeTitle = fallbackTitle.replace(/[\\/*?:"<>|]/g, '').trim() || "tiktok_video";
+        return `${safeTitle}.mp4`;
     }
 
     // Download via blob com nome correto
-    async function downloadVideoAsFile(videoUrl, rawTitle) {
-        try {
-            const fileNameBase = sanitizeFilename(rawTitle);
-            const response = await fetch(videoUrl);
-            if (!response.ok) throw new Error('Falha ao baixar stream');
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            let filename = `${fileNameBase}.mp4`;
-            // Garantir que não esteja vazio
-            if (!filename || filename === '.mp4') filename = `tiktok_${Date.now()}.mp4`;
-            link.href = blobUrl;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(blobUrl);
-            return true;
-        } catch (err) {
-            console.warn('Blob download falhou', err);
-            return false;
-        }
+    async function downloadBlob(blob, filename) {
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
     }
 
-    // Função principal: chamar API e processar
+    // Função principal: chamar sua API e baixar o vídeo
     async function fetchTikTokVideo() {
         const videoUrl = videoUrlInput.value.trim();
 
@@ -485,130 +440,52 @@
         downloadBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processando...';
 
         try {
-            const apiUrl = `https://tiktok-video-downloader-api.p.rapidapi.com/media?videoUrl=${encodeURIComponent(videoUrl)}`;
-            
-            const response = await fetch(apiUrl, {
-                method: 'GET',
+            const endpoint = `${API_BASE_URL}/download/video`;
+            const response = await fetch(endpoint, {
+                method: 'POST',
                 headers: {
-                    'x-rapidapi-key': API_KEY,
-                    'x-rapidapi-host': 'tiktok-video-downloader-api.p.rapidapi.com'
-                }
+                    'Content-Type': 'application/json',
+                    'X-API-Key': API_KEY
+                },
+                body: JSON.stringify({ url: videoUrl })
             });
 
             if (!response.ok) {
                 let errorText = `Erro ${response.status}`;
-                if (response.status === 403) errorText = 'Chave de API inválida ou expirada. Contate o suporte.';
-                else if (response.status === 429) errorText = 'Limite de requisições excedido. Tente mais tarde.';
-                else if (response.status === 404) errorText = 'Vídeo não encontrado ou URL inválida.';
+                if (response.status === 401) errorText = 'Chave de API inválida. Contate o administrador.';
+                else if (response.status === 403) errorText = 'Acesso negado. Verifique sua chave de API.';
+                else if (response.status === 400) errorText = 'URL inválida ou vídeo não encontrado.';
+                else if (response.status === 429) errorText = 'Muitas requisições. Tente mais tarde.';
+                else if (response.status >= 500) errorText = 'Erro interno no servidor. Tente novamente.';
                 throw new Error(errorText);
             }
 
-            const data = await response.json();
-            console.log("Resposta da API:", data); // Para debug
+            // Sucesso: obter o blob do vídeo
+            const blob = await response.blob();
+            const contentDisposition = response.headers.get('Content-Disposition');
+            // Tenta extrair título da URL original (fallback)
+            let titleFromUrl = "TikTok_Video";
+            try {
+                const urlObj = new URL(videoUrl);
+                const pathParts = urlObj.pathname.split('/');
+                const videoId = pathParts[pathParts.length - 1] || "video";
+                titleFromUrl = `tiktok_${videoId}`;
+            } catch(e) { /* ignora */ }
+            const filename = extractFilenameFromHeaders(contentDisposition, titleFromUrl);
 
-            let downloadUrl = null;
-            let videoTitle = null;
-            let thumbnailUrl = null;
-
-            // Estruturas conhecidas da API (ajustado para capturar título e thumbnail real)
-            // Possibilidade 1: dados diretos
-            if (data.downloadUrl) {
-                downloadUrl = data.downloadUrl;
-                videoTitle = data.title || data.desc || null;
-                thumbnailUrl = data.thumbnail || data.thumb || null;
-            } 
-            // Possibilidade 2: dentro de data
-            else if (data.data && data.data.downloadUrl) {
-                downloadUrl = data.data.downloadUrl;
-                videoTitle = data.data.title || data.data.desc || null;
-                thumbnailUrl = data.data.thumbnail || data.data.thumb || null;
-            }
-            // Possibilidade 3: dentro de video
-            else if (data.video && data.video.downloadUrl) {
-                downloadUrl = data.video.downloadUrl;
-                videoTitle = data.video.title || data.video.desc || null;
-                thumbnailUrl = data.video.thumb || data.video.thumbnail || null;
-            }
-            // Possibilidade 4: resultado aninhado
-            else if (data.result && data.result.downloadUrl) {
-                downloadUrl = data.result.downloadUrl;
-                videoTitle = data.result.title || data.result.desc || null;
-                thumbnailUrl = data.result.thumbnail || data.result.thumb || null;
-            }
-            else {
-                // Tenta encontrar qualquer URL de download nos campos comuns
-                const possibleUrl = data.url || data.videoUrl || data.link;
-                if (possibleUrl) downloadUrl = possibleUrl;
-                videoTitle = data.title || data.desc || data.caption || null;
-                thumbnailUrl = data.thumb || data.thumbnail || null;
-            }
-
-            // Se ainda não temos título, tenta extrair da resposta de forma mais profunda
-            if (!videoTitle) {
-                if (data.desc) videoTitle = data.desc;
-                else if (data.caption) videoTitle = data.caption;
-                else if (data.title) videoTitle = data.title;
-                else if (data.data && data.data.desc) videoTitle = data.data.desc;
-                else if (data.video && data.video.desc) videoTitle = data.video.desc;
-            }
-
-            // Limpeza do título (remover tags HTML)
-            let cleanDisplayTitle = "Vídeo TikTok";
-            if (videoTitle) {
-                cleanDisplayTitle = cleanTitle(videoTitle);
-                // Se após limpeza ficar vazio, usa padrão
-                if (!cleanDisplayTitle) cleanDisplayTitle = "Vídeo TikTok";
-            }
-
-            // Thumbnail: se não veio, usa placeholder
-            if (!thumbnailUrl) {
-                thumbnailUrl = 'https://placehold.co/400x600?text=Sem+Preview';
-            }
-
-            if (!downloadUrl) {
-                throw new Error('A API não retornou o link de download. Verifique se o vídeo é público.');
-            }
-
-            // Montar card de resultado com thumbnail real e título real
-            resultArea.innerHTML = `
-                <div class="result-card" id="resultCard">
-                    <div class="video-preview">
-                        <div class="thumbnail">
-                            <img src="${thumbnailUrl}" alt="thumbnail" referrerpolicy="no-referrer" onerror="this.src='https://placehold.co/400x600?text=Sem+Preview'">
-                        </div>
-                        <div class="info">
-                            <h3><i class="fab fa-tiktok"></i> ${escapeHtml(cleanDisplayTitle)}</h3>
-                            <p><i class="fas fa-download"></i> Clique no botão abaixo para salvar o vídeo em alta qualidade (sem marca d'água)</p>
-                            <button class="btn-save" id="finalDownloadBtn"><i class="fas fa-arrow-down"></i> Baixar vídeo</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            const finalDownloadUrl = downloadUrl;
-            const finalRawTitle = cleanDisplayTitle; // Título já limpo para exibição e nome de arquivo
-
-            const finalBtn = document.getElementById('finalDownloadBtn');
-            if (finalBtn) {
-                finalBtn.addEventListener('click', async () => {
-                    finalBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Preparando...';
+            // Exibir área de sucesso com botão de download
+            showSuccess(`Vídeo pronto: ${filename}`, async () => {
+                const finalBtn = document.getElementById('finalDownloadBtn');
+                if (finalBtn) {
+                    finalBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Baixando...';
                     finalBtn.disabled = true;
-                    const success = await downloadVideoAsFile(finalDownloadUrl, finalRawTitle);
-                    if (!success) {
-                        // Fallback: abrir em nova aba
-                        window.open(finalDownloadUrl, '_blank');
-                        const msgDiv = document.createElement('div');
-                        msgDiv.className = 'error-message';
-                        msgDiv.style.marginTop = '12px';
-                        msgDiv.innerHTML = '<i class="fas fa-info-circle"></i> Download direto não foi possível, abrimos o vídeo em nova aba. Clique com botão direito e "Salvar como".';
-                        document.querySelector('.result-card').appendChild(msgDiv);
-                    }
+                }
+                await downloadBlob(blob, filename);
+                if (finalBtn) {
                     finalBtn.innerHTML = '<i class="fas fa-arrow-down"></i> Baixar vídeo';
                     finalBtn.disabled = false;
-                });
-            }
-
-            document.getElementById('resultCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
 
         } catch (error) {
             console.error(error);
@@ -622,18 +499,6 @@
             downloadBtn.disabled = false;
             downloadBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Baixar vídeo agora';
         }
-    }
-
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c; // mantém emojis na exibição
-        });
     }
 
     downloadBtn.addEventListener('click', fetchTikTokVideo);
