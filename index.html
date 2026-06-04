@@ -754,14 +754,15 @@
     }
 
     async function iniciarProcessamento() {
-        let videoUrl = videoUrlInput.value.trim();
-        if (videoUrl.includes('?')) videoUrl = videoUrl.split('?')[0];
-        if (!videoUrl.startsWith('http')) videoUrl = 'https://' + videoUrl;
+    let videoUrl = videoUrlInput.value.trim();
+    if (videoUrl.includes('?')) videoUrl = videoUrl.split('?')[0];
+    if (!videoUrl.startsWith('http')) videoUrl = 'https://' + videoUrl;
 
-        if (!videoUrl) {
-            showError('Por favor, insira a URL do vídeo do TikTok.');
-            return;
-        }
+    // 🔥 NOVA VERIFICAÇÃO - Links encurtados
+    if (videoUrl.includes('vt.tiktok.com') || videoUrl.includes('vm.tiktok.com')) {
+        showError('❌ Links encurtados (vt.tiktok.com ou vm.tiktok.com) não são suportados.\nUse o link direto do TikTok: copie a URL pelo navegador, não pelo aplicativo.\n\nExemplo: https://www.tiktok.com/@usuario/video/123456789');
+        return;
+    }
 
         const tiktokRegex = /^(https?:\/\/)?((www|vm|vt)\.)?tiktok\.com\/(@[\w.]+|t\/[\w]+|embed|v\/\d+|\w+)/i;
         if (!tiktokRegex.test(videoUrl)) {
