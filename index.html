@@ -10,7 +10,7 @@
     <!-- Google Fonts: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- SEUS ESTILOS AQUI (MANTENHA OS MESMOS) --- */
+        /* --- ESTILOS (mantidos iguais aos seus) --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; position: relative; }
         .container { max-width: 880px; width: 100%; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border-radius: 2rem; padding: 2rem; box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s ease; }
@@ -75,18 +75,17 @@
     </footer>
 </div>
 
-<!-- Botão flutuante no canto inferior direito -->
+<!-- Botão flutuante -->
 <button class="btn-api-float" id="apiDocsBtn">
     <i class="fas fa-book-open"></i> Documentação da API
 </button>
 
 <script>
     // ============================================================
-    // CONFIGURAÇÃO DA SUA PRÓPRIA API
+    // CONFIGURAÇÃO DA API
     // ============================================================
     const API_BASE_URL = "https://api-tiktok-pc0800.onrender.com";
-    const API_KEY = "7x9K!mQ2@zLp#wR4";   // Sua chave definida no Render
-
+    const API_KEY = "7x9K!mQ2@zLp#wR4";   // Sua chave
     const API_DOCS_URL = API_BASE_URL + "/docs";
 
     const videoUrlInput = document.getElementById('videoUrl');
@@ -96,6 +95,17 @@
 
     if (apiDocsBtn) {
         apiDocsBtn.addEventListener('click', () => window.open(API_DOCS_URL, '_blank'));
+    }
+
+    // Função para escapar caracteres HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
 
     function showLoading(show, message = "Buscando informações do vídeo...") {
@@ -112,8 +122,8 @@
         resultArea.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
     }
 
-    // Função para mostrar a prévia do vídeo após obter as informações
-    function showPreview(thumbnailUrl, videoTitle, downloadHandler) {
+    // Função para mostrar a prévia com dois botões (vídeo e áudio)
+    function showPreview(thumbnailUrl, videoTitle, videoDownloadHandler, audioDownloadHandler) {
         resultArea.innerHTML = `
             <div class="result-card" id="resultCard">
                 <div class="video-preview">
@@ -122,30 +132,22 @@
                     </div>
                     <div class="info">
                         <h3><i class="fab fa-tiktok"></i> ${escapeHtml(videoTitle)}</h3>
-                        <p><i class="fas fa-download"></i> Clique no botão abaixo para salvar o vídeo em alta qualidade (sem marca d'água)</p>
-                        <button class="btn-save" id="finalDownloadBtn"><i class="fas fa-arrow-down"></i> Baixar vídeo</button>
+                        <p><i class="fas fa-download"></i> Escolha o formato:</p>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn-save" id="finalDownloadBtnVideo"><i class="fas fa-video"></i> Baixar vídeo (MP4)</button>
+                            <button class="btn-save" id="finalDownloadBtnAudio"><i class="fas fa-music"></i> Baixar áudio (MP3)</button>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
-        const finalBtn = document.getElementById('finalDownloadBtn');
-        if (finalBtn && downloadHandler) {
-            finalBtn.addEventListener('click', downloadHandler);
-        }
+        const videoBtn = document.getElementById('finalDownloadBtnVideo');
+        const audioBtn = document.getElementById('finalDownloadBtnAudio');
+        if (videoBtn && videoDownloadHandler) videoBtn.addEventListener('click', videoDownloadHandler);
+        if (audioBtn && audioDownloadHandler) audioBtn.addEventListener('click', audioDownloadHandler);
         document.getElementById('resultCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    // Função para sanitizar nome de arquivo
     function sanitizeFilename(name) {
         if (!name) return "tiktok_video";
         let clean = name.replace(/<[^>]*>/g, '');
@@ -156,114 +158,142 @@
         return clean || "tiktok_video";
     }
 
-    // Função principal do fluxo: Buscar Info -> Mostrar Prévia -> Baixar Vídeo
     async function iniciarProcessamento() {
-    // Obtém a URL e já remove espaços extras
-    let videoUrl = videoUrlInput.value.trim();
-    
-    // --- LIMPEZA DA URL: remove tudo após "?" (parâmetros) ---
-    if (videoUrl.includes('?')) {
-        videoUrl = videoUrl.split('?')[0];
-    }
-    
-    // --- Adiciona https:// se não tiver ---
-    if (!videoUrl.startsWith('http')) {
-        videoUrl = 'https://' + videoUrl;
-    }
-    // -------------------------------------------------------
-
-    if (!videoUrl) {
-        showError('Por favor, insira a URL do vídeo do TikTok.');
-        return;
-    }
-
-    const tiktokRegex = /^(https?:\/\/)?(www\.|vm\.)?tiktok\.com\/(@[\w.]+|t\/[\w]+|embed|v\/\d+)/i;
-    if (!tiktokRegex.test(videoUrl) && !videoUrl.includes('tiktok.com')) {
-        showError('URL inválida. Cole um link válido do TikTok (ex: https://www.tiktok.com/@user/video/123)');
-        return;
-    }
-
-    showLoading(true);
-    downloadBtn.disabled = true;
-    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processando...';
-
-    try {
-        const infoEndpoint = `${API_BASE_URL}/info?url=${encodeURIComponent(videoUrl)}`;
-        const infoResponse = await fetch(infoEndpoint, {
-            method: 'GET',
-            headers: { 'X-API-Key': API_KEY }
-        });
-
-        if (!infoResponse.ok) {
-            let errorMsg = `Erro ${infoResponse.status}`;
-            if (infoResponse.status === 401) errorMsg = 'Chave de API inválida.';
-            if (infoResponse.status === 404) errorMsg = 'Vídeo não encontrado. Verifique a URL.';
-            throw new Error(errorMsg);
+        let videoUrl = videoUrlInput.value.trim();
+        
+        // Limpeza da URL: remove parâmetros após '?' e adiciona https://
+        if (videoUrl.includes('?')) {
+            videoUrl = videoUrl.split('?')[0];
+        }
+        if (!videoUrl.startsWith('http')) {
+            videoUrl = 'https://' + videoUrl;
         }
 
-        const infoData = await infoResponse.json();
-        const videoTitle = infoData.title;
-        const thumbnailUrl = infoData.thumbnail || 'https://placehold.co/400x600?text=Sem+Preview';
-
-        showPreview(thumbnailUrl, videoTitle, async () => {
-            const downloadBtnInPreview = document.getElementById('finalDownloadBtn');
-            if (downloadBtnInPreview) {
-                downloadBtnInPreview.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Baixando...';
-                downloadBtnInPreview.disabled = true;
-            }
-
-            try {
-                const downloadEndpoint = `${API_BASE_URL}/download/video`;
-                const downloadResponse = await fetch(downloadEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-Key': API_KEY
-                    },
-                    body: JSON.stringify({ url: videoUrl })
-                });
-
-                if (!downloadResponse.ok) {
-                    let errorMsg = `Erro ${downloadResponse.status}`;
-                    if (downloadResponse.status === 400) errorMsg = 'URL inválida ou vídeo não encontrado.';
-                    throw new Error(errorMsg);
-                }
-
-                const blob = await downloadResponse.blob();
-                const filename = sanitizeFilename(videoTitle) + ".mp4";
-                const blobUrl = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(blobUrl);
-
-            } catch (downloadError) {
-                console.error(downloadError);
-                showError(`Erro ao baixar: ${downloadError.message || 'Falha no download. Tente novamente.'}`);
-            } finally {
-                if (downloadBtnInPreview) {
-                    downloadBtnInPreview.innerHTML = '<i class="fas fa-arrow-down"></i> Baixar vídeo';
-                    downloadBtnInPreview.disabled = false;
-                }
-            }
-        });
-
-    } catch (infoError) {
-        console.error(infoError);
-        let userMsg = infoError.message || 'Falha ao obter informações do vídeo.';
-        if (userMsg.includes('Failed to fetch') || userMsg.includes('NetworkError')) {
-            userMsg = 'Erro de rede. Verifique sua conexão com a internet.';
+        if (!videoUrl) {
+            showError('Por favor, insira a URL do vídeo do TikTok.');
+            return;
         }
-        showError(userMsg);
-    } finally {
-        showLoading(false);
-        downloadBtn.disabled = false;
-        downloadBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Baixar vídeo agora';
+
+        const tiktokRegex = /^(https?:\/\/)?(www\.|vm\.)?tiktok\.com\/(@[\w.]+|t\/[\w]+|embed|v\/\d+)/i;
+        if (!tiktokRegex.test(videoUrl) && !videoUrl.includes('tiktok.com')) {
+            showError('URL inválida. Cole um link válido do TikTok.');
+            return;
+        }
+
+        showLoading(true);
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processando...';
+
+        try {
+            const infoEndpoint = `${API_BASE_URL}/info?url=${encodeURIComponent(videoUrl)}`;
+            const infoResponse = await fetch(infoEndpoint, {
+                method: 'GET',
+                headers: { 'X-API-Key': API_KEY }
+            });
+            if (!infoResponse.ok) {
+                let errorMsg = `Erro ${infoResponse.status}`;
+                if (infoResponse.status === 401) errorMsg = 'Chave de API inválida.';
+                if (infoResponse.status === 404) errorMsg = 'Vídeo não encontrado. Verifique a URL.';
+                throw new Error(errorMsg);
+            }
+
+            const infoData = await infoResponse.json();
+            const videoTitle = infoData.title;
+            const thumbnailUrl = infoData.thumbnail || 'https://placehold.co/400x600?text=Sem+Preview';
+
+            // ========== HANDLER PARA VÍDEO (MP4) ==========
+            const videoDownloadHandler = async () => {
+                const videoBtn = document.getElementById('finalDownloadBtnVideo');
+                if (videoBtn) {
+                    videoBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Baixando vídeo...';
+                    videoBtn.disabled = true;
+                }
+                try {
+                    const downloadEndpoint = `${API_BASE_URL}/download/video`;
+                    const downloadResponse = await fetch(downloadEndpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-API-Key': API_KEY
+                        },
+                        body: JSON.stringify({ url: videoUrl })
+                    });
+                    if (!downloadResponse.ok) throw new Error(`Erro ${downloadResponse.status}`);
+                    const blob = await downloadResponse.blob();
+                    const filename = sanitizeFilename(videoTitle) + ".mp4";
+                    const blobUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(blobUrl);
+                } catch (err) {
+                    showError(`Erro ao baixar vídeo: ${err.message}`);
+                } finally {
+                    if (videoBtn) {
+                        videoBtn.innerHTML = '<i class="fas fa-video"></i> Baixar vídeo (MP4)';
+                        videoBtn.disabled = false;
+                    }
+                }
+            };
+
+            // ========== HANDLER PARA ÁUDIO (MP3) ==========
+            const audioDownloadHandler = async () => {
+                const audioBtn = document.getElementById('finalDownloadBtnAudio');
+                if (audioBtn) {
+                    audioBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processando áudio...';
+                    audioBtn.disabled = true;
+                }
+                try {
+                    const downloadEndpoint = `${API_BASE_URL}/download/audio`;
+                    const downloadResponse = await fetch(downloadEndpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-API-Key': API_KEY
+                        },
+                        body: JSON.stringify({ url: videoUrl })
+                    });
+                    if (!downloadResponse.ok) throw new Error(`Erro ${downloadResponse.status}`);
+                    const blob = await downloadResponse.blob();
+                    const filename = sanitizeFilename(videoTitle) + ".mp3";
+                    const blobUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(blobUrl);
+                } catch (err) {
+                    showError(`Erro ao baixar áudio: ${err.message}`);
+                } finally {
+                    if (audioBtn) {
+                        audioBtn.innerHTML = '<i class="fas fa-music"></i> Baixar áudio (MP3)';
+                        audioBtn.disabled = false;
+                    }
+                }
+            };
+
+            // Exibe a prévia com os dois botões
+            showPreview(thumbnailUrl, videoTitle, videoDownloadHandler, audioDownloadHandler);
+
+        } catch (infoError) {
+            console.error(infoError);
+            let userMsg = infoError.message || 'Falha ao obter informações do vídeo.';
+            if (userMsg.includes('Failed to fetch') || userMsg.includes('NetworkError')) {
+                userMsg = 'Erro de rede. Verifique sua conexão com a internet.';
+            }
+            showError(userMsg);
+        } finally {
+            showLoading(false);
+            downloadBtn.disabled = false;
+            downloadBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Baixar vídeo agora';
+        }
     }
-}
+
     downloadBtn.addEventListener('click', iniciarProcessamento);
     videoUrlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') iniciarProcessamento(); });
     videoUrlInput.addEventListener('focus', () => { if (resultArea.innerHTML.includes('error-message')) resultArea.innerHTML = ''; });
