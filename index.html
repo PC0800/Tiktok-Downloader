@@ -36,11 +36,14 @@
             transition: background 0.3s, box-shadow 0.3s;
         }
 
-        /* Cabeçalho */
+        /* Cabeçalho com flex para título e seletor de idioma */
         .header {
             text-align: center;
             margin-bottom: 24px;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
         }
         .header h1 {
             font-size: 1.8rem;
@@ -53,23 +56,33 @@
             opacity: 0.8;
         }
 
-        /* Seletor de idiomas */
-        .language-selector {
-            position: absolute;
-            top: 0;
-            right: 0;
+        /* Seletor de idioma */
+        .lang-selector {
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(8px);
-            border-radius: 40px;
-            padding: 5px 12px;
-            font-size: 0.8rem;
+            border-radius: 60px;
+            padding: 6px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             border: 1px solid rgba(255,255,255,0.2);
-            color: white;
             cursor: pointer;
-            outline: none;
-            font-family: 'Poppins', sans-serif;
+            transition: 0.2s;
         }
-        .language-selector option {
+        .lang-selector i {
+            font-size: 1rem;
+        }
+        .lang-selector select {
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+        }
+        .lang-selector select option {
             background: #1e293b;
             color: white;
         }
@@ -206,7 +219,7 @@
             transform: scale(1.05);
         }
 
-        /* Botão documentação */
+        /* Botão documentação (já existente) */
         .btn-api-float {
             position: fixed;
             bottom: 20px;
@@ -342,6 +355,17 @@
                 margin-bottom: 0;
                 margin-right: 12px;
             }
+            .header {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
+            .header h1, .header p {
+                text-align: left;
+            }
+            .header .lang-selector {
+                margin-left: auto;
+            }
         }
     </style>
 </head>
@@ -349,21 +373,24 @@
 
 <div class="container" id="appContainer">
     <div class="header">
-        <h1><i class="fab fa-tiktok"></i> <span id="siteTitle">TikTok Downloader</span></h1>
-        <p id="siteDescription">Baixe vídeos sem marca d'água · Rápido e grátis</p>
-        <select id="languageSelect" class="language-selector">
-            <option value="en">🇬🇧 English</option>
-            <option value="pt-br" selected>🇧🇷 Português (BR)</option>
-            <option value="pt">🇵🇹 Português (PT)</option>
-            <option value="fr">🇫🇷 Français</option>
-            <option value="es">🇪🇸 Español</option>
-            <option value="de">🇩🇪 Deutsch</option>
-        </select>
+        <div>
+            <h1><i class="fab fa-tiktok"></i> <span id="titleText">TikTok Downloader</span></h1>
+            <p id="subtitleText">Baixe vídeos sem marca d'água · Rápido e grátis</p>
+        </div>
+        <div class="lang-selector">
+            <i class="fas fa-globe"></i>
+            <select id="languageSelect">
+                <option value="pt-br">🇧🇷 PT-BR</option>
+                <option value="en">🇺🇸 ENG</option>
+                <option value="fr">🇫🇷 FR</option>
+                <option value="pt">🇵🇹 PT</option>
+            </select>
+        </div>
     </div>
 
     <div class="card" id="mainCard">
         <div class="input-group">
-            <label id="labelUrl"><i class="fab fa-tiktok"></i> URL do TikTok</label>
+            <label id="urlLabel"><i class="fab fa-tiktok"></i> URL do TikTok</label>
             <div class="input-wrapper" id="inputWrapper">
                 <i class="fas fa-link"></i>
                 <input type="text" id="videoUrl" placeholder="https://www.tiktok.com/@usuario/video/123456789" value="https://vm.tiktok.com/ZIJWNwKxu">
@@ -372,13 +399,13 @@
 
         <div class="quality-row">
             <div class="quality-item">
-                <label id="labelVideoQuality"><i class="fas fa-video"></i> Qualidade do vídeo</label>
+                <label id="videoQualityLabel"><i class="fas fa-video"></i> Qualidade do vídeo</label>
                 <select id="videoQuality" class="input-wrapper">
                     <option value="1080p" selected>1080p</option>
                 </select>
             </div>
             <div class="quality-item">
-                <label id="labelAudioQuality"><i class="fas fa-music"></i> Qualidade do áudio</label>
+                <label id="audioQualityLabel"><i class="fas fa-music"></i> Qualidade do áudio</label>
                 <select id="audioQuality" class="input-wrapper">
                     <option value="128kbps" selected>128 kbps</option>
                     <option value="64kbps">64 kbps</option>
@@ -388,7 +415,7 @@
             </div>
         </div>
 
-        <button class="btn-download" id="downloadBtn"><i class="fas fa-cloud-download-alt"></i> <span id="btnDownloadText">Baixar agora</span></button>
+        <button class="btn-download" id="downloadBtn"><i class="fas fa-cloud-download-alt"></i> <span id="downloadBtnText">Baixar agora</span></button>
     </div>
 
     <div id="resultArea"></div>
@@ -406,6 +433,7 @@
     <i class="fas fa-palette"></i>
 </button>
 <div class="theme-panel hidden" id="themePanel">
+    <!-- 10 opções de cores -->
     <div class="theme-option" data-theme="dark" style="background: #0f172a;"></div>
     <div class="theme-option" data-theme="light" style="background: #f8fafc; border-color:#ccc;"></div>
     <div class="theme-option" data-theme="blue" style="background: #1e3a8a;"></div>
@@ -419,6 +447,140 @@
 </div>
 
 <script>
+    // ============================================================
+    // TRADUÇÕES
+    // ============================================================
+    const translations = {
+        'en': {
+            title: 'TikTok Downloader',
+            subtitle: 'Download videos without watermark · Fast & free',
+            urlLabel: 'TikTok URL',
+            urlPlaceholder: 'https://www.tiktok.com/@username/video/123456789',
+            videoQualityLabel: 'Video quality',
+            audioQualityLabel: 'Audio quality',
+            downloadBtn: 'Download now',
+            apiDocsBtn: 'API Docs',
+            footer: 'Video downloaded directly from TikTok CDN. Respect copyrights.',
+            loadingInfo: 'Fetching video info...',
+            loadingDownload: 'Downloading...',
+            loadingAudio: 'Processing audio...',
+            chooseFormat: 'Choose the format:',
+            videoBtn: 'Video (MP4)',
+            audioBtn: 'Audio (MP3)',
+            errorShortLink: '❌ Short links (vt.tiktok.com or vm.tiktok.com) are not supported.\nUse the direct TikTok URL: copy the link from your browser, not from the app.\n\nExample: https://www.tiktok.com/@user/video/123456789',
+            errorInvalidUrl: 'Invalid URL. Please enter a valid TikTok link.',
+            errorFetch: 'Failed to get video information.',
+            errorDownloadVideo: 'Error downloading video: ',
+            errorDownloadAudio: 'Error downloading audio: ',
+            errorNetwork: 'Network error. Check your connection.',
+            processing: 'Processing...'
+        },
+        'pt-br': {
+            title: 'TikTok Downloader',
+            subtitle: 'Baixe vídeos sem marca d\'água · Rápido e grátis',
+            urlLabel: 'URL do TikTok',
+            urlPlaceholder: 'https://www.tiktok.com/@usuario/video/123456789',
+            videoQualityLabel: 'Qualidade do vídeo',
+            audioQualityLabel: 'Qualidade do áudio',
+            downloadBtn: 'Baixar agora',
+            apiDocsBtn: 'API Docs',
+            footer: 'Vídeo baixado diretamente da CDN do TikTok. Respeite os direitos autorais.',
+            loadingInfo: 'Buscando informações do vídeo...',
+            loadingDownload: 'Baixando...',
+            loadingAudio: 'Processando áudio...',
+            chooseFormat: 'Escolha o formato:',
+            videoBtn: 'Vídeo (MP4)',
+            audioBtn: 'Áudio (MP3)',
+            errorShortLink: '❌ Links encurtados (vt.tiktok.com ou vm.tiktok.com) não são suportados.\nUse o link direto do TikTok: copie a URL pelo navegador, não pelo aplicativo.\n\nExemplo: https://www.tiktok.com/@usuario/video/123456789',
+            errorInvalidUrl: 'URL inválida. Cole um link válido do TikTok.',
+            errorFetch: 'Falha ao obter informações do vídeo.',
+            errorDownloadVideo: 'Erro ao baixar vídeo: ',
+            errorDownloadAudio: 'Erro ao baixar áudio: ',
+            errorNetwork: 'Erro de rede. Verifique sua conexão.',
+            processing: 'Processando...'
+        },
+        'fr': {
+            title: 'TikTok Downloader',
+            subtitle: 'Téléchargez des vidéos sans filigrane · Rapide et gratuit',
+            urlLabel: 'URL TikTok',
+            urlPlaceholder: 'https://www.tiktok.com/@utilisateur/video/123456789',
+            videoQualityLabel: 'Qualité vidéo',
+            audioQualityLabel: 'Qualité audio',
+            downloadBtn: 'Télécharger',
+            apiDocsBtn: 'API Docs',
+            footer: 'Vidéo téléchargée directement depuis le CDN de TikTok. Respectez les droits d\'auteur.',
+            loadingInfo: 'Recherche des infos vidéo...',
+            loadingDownload: 'Téléchargement...',
+            loadingAudio: 'Traitement audio...',
+            chooseFormat: 'Choisissez le format :',
+            videoBtn: 'Vidéo (MP4)',
+            audioBtn: 'Audio (MP3)',
+            errorShortLink: '❌ Les liens raccourcis (vt.tiktok.com ou vm.tiktok.com) ne sont pas supportés.\nUtilisez le lien direct TikTok : copiez l\'URL depuis votre navigateur, pas depuis l\'application.\n\nExemple : https://www.tiktok.com/@utilisateur/video/123456789',
+            errorInvalidUrl: 'URL invalide. Veuillez entrer un lien TikTok valide.',
+            errorFetch: 'Échec de la récupération des infos vidéo.',
+            errorDownloadVideo: 'Erreur lors du téléchargement de la vidéo : ',
+            errorDownloadAudio: 'Erreur lors du téléchargement de l\'audio : ',
+            errorNetwork: 'Erreur réseau. Vérifiez votre connexion.',
+            processing: 'Traitement en cours...'
+        },
+        'pt': {
+            title: 'TikTok Downloader',
+            subtitle: 'Descarregue vídeos sem marca de água · Rápido e grátis',
+            urlLabel: 'URL do TikTok',
+            urlPlaceholder: 'https://www.tiktok.com/@utilizador/video/123456789',
+            videoQualityLabel: 'Qualidade do vídeo',
+            audioQualityLabel: 'Qualidade do áudio',
+            downloadBtn: 'Descarregar agora',
+            apiDocsBtn: 'API Docs',
+            footer: 'Vídeo descarregado diretamente da CDN do TikTok. Respeite os direitos de autor.',
+            loadingInfo: 'A obter informações do vídeo...',
+            loadingDownload: 'A descarregar...',
+            loadingAudio: 'A processar áudio...',
+            chooseFormat: 'Escolha o formato:',
+            videoBtn: 'Vídeo (MP4)',
+            audioBtn: 'Áudio (MP3)',
+            errorShortLink: '❌ Links encurtados (vt.tiktok.com ou vm.tiktok.com) não são suportados.\nUse o link direto do TikTok: copie a URL pelo navegador, não pela aplicação.\n\nExemplo: https://www.tiktok.com/@utilizador/video/123456789',
+            errorInvalidUrl: 'URL inválida. Insira um link válido do TikTok.',
+            errorFetch: 'Falha ao obter informações do vídeo.',
+            errorDownloadVideo: 'Erro ao descarregar vídeo: ',
+            errorDownloadAudio: 'Erro ao descarregar áudio: ',
+            errorNetwork: 'Erro de rede. Verifique a sua ligação.',
+            processing: 'A processar...'
+        }
+    };
+
+    let currentLang = 'pt-br';
+
+    function applyLanguage(lang) {
+        currentLang = lang;
+        const t = translations[lang];
+        if (!t) return;
+        document.documentElement.lang = lang === 'pt-br' ? 'pt-br' : (lang === 'pt' ? 'pt' : lang);
+        document.getElementById('titleText').innerText = t.title;
+        document.getElementById('subtitleText').innerText = t.subtitle;
+        document.getElementById('urlLabel').innerHTML = `<i class="fab fa-tiktok"></i> ${t.urlLabel}`;
+        document.getElementById('videoUrl').placeholder = t.urlPlaceholder;
+        document.getElementById('videoQualityLabel').innerHTML = `<i class="fas fa-video"></i> ${t.videoQualityLabel}`;
+        document.getElementById('audioQualityLabel').innerHTML = `<i class="fas fa-music"></i> ${t.audioQualityLabel}`;
+        document.getElementById('downloadBtnText').innerText = t.downloadBtn;
+        document.getElementById('apiDocsText').innerText = t.apiDocsBtn;
+        document.getElementById('footerText').innerText = t.footer;
+        // Atualizar também textos dinâmicos em elementos que podem ser recriados (botões de preview, loading, error)
+        // As mensagens de erro e loading serão traduzidas no momento da exibição via funções.
+        localStorage.setItem('selectedLanguage', lang);
+    }
+
+    function getTranslation(key, ...args) {
+        let text = translations[currentLang][key];
+        if (!text) text = translations['en'][key] || key;
+        if (args.length) {
+            args.forEach((arg, i) => {
+                text = text.replace(`{${i}}`, arg);
+            });
+        }
+        return text;
+    }
+
     // ============================================================
     // CONFIGURAÇÃO DA API
     // ============================================================
@@ -438,192 +600,9 @@
     const appContainer = document.getElementById('appContainer');
     const mainCard = document.getElementById('mainCard');
     const inputWrapper = document.getElementById('inputWrapper');
+    const languageSelect = document.getElementById('languageSelect');
 
-    // ========== SISTEMA DE IDIOMAS ==========
-    const translations = {
-        en: {
-            siteTitle: "TikTok Downloader",
-            siteDescription: "Download videos without watermark · Fast & free",
-            labelUrl: "TikTok URL",
-            labelVideoQuality: "Video quality",
-            labelAudioQuality: "Audio quality",
-            btnDownloadText: "Download now",
-            footerText: "Video downloaded directly from TikTok CDN. Respect copyrights.",
-            apiDocsText: "API Docs",
-            loadingMessage: "Searching video info...",
-            errorShortLink: "❌ Shortened links (vt.tiktok.com or vm.tiktok.com) are not supported.\nUse the direct TikTok link: copy the URL from the browser, not from the app.\n\nExample: https://www.tiktok.com/@user/video/123456789",
-            errorInvalidUrl: "Invalid URL. Paste a valid TikTok link.",
-            errorFetchInfo: "Failed to get video info.",
-            errorDownloadVideo: "Error downloading video: ",
-            errorDownloadAudio: "Error downloading audio: ",
-            chooseFormat: "Choose format:",
-            videoBtn: "Video (MP4)",
-            audioBtn: "Audio (MP3)",
-            processing: "Processing...",
-            downloadingVideo: "Downloading...",
-            processingAudio: "Processing audio...",
-            previewTitle: "Choose format:",
-            errorNetwork: "Network error. Check your internet connection.",
-        },
-        "pt-br": {
-            siteTitle: "TikTok Downloader",
-            siteDescription: "Baixe vídeos sem marca d'água · Rápido e grátis",
-            labelUrl: "URL do TikTok",
-            labelVideoQuality: "Qualidade do vídeo",
-            labelAudioQuality: "Qualidade do áudio",
-            btnDownloadText: "Baixar agora",
-            footerText: "Vídeo baixado diretamente da CDN do TikTok. Respeite os direitos autorais.",
-            apiDocsText: "Documentação da API",
-            loadingMessage: "Buscando informações do vídeo...",
-            errorShortLink: "❌ Links encurtados (vt.tiktok.com ou vm.tiktok.com) não são suportados.\nUse o link direto do TikTok: copie a URL pelo navegador, não pelo aplicativo.\n\nExemplo: https://www.tiktok.com/@usuario/video/123456789",
-            errorInvalidUrl: "URL inválida. Cole um link válido do TikTok.",
-            errorFetchInfo: "Falha ao obter informações do vídeo.",
-            errorDownloadVideo: "Erro ao baixar vídeo: ",
-            errorDownloadAudio: "Erro ao baixar áudio: ",
-            chooseFormat: "Escolha o formato:",
-            videoBtn: "Vídeo (MP4)",
-            audioBtn: "Áudio (MP3)",
-            processing: "Processando...",
-            downloadingVideo: "Baixando...",
-            processingAudio: "Processando áudio...",
-            previewTitle: "Escolha o formato:",
-            errorNetwork: "Erro de rede. Verifique sua conexão com a internet.",
-        },
-        pt: {
-            siteTitle: "TikTok Downloader",
-            siteDescription: "Baixe vídeos sem marca de água · Rápido e grátis",
-            labelUrl: "URL do TikTok",
-            labelVideoQuality: "Qualidade do vídeo",
-            labelAudioQuality: "Qualidade do áudio",
-            btnDownloadText: "Baixar agora",
-            footerText: "Vídeo descarregado diretamente da CDN do TikTok. Respeite os direitos de autor.",
-            apiDocsText: "Documentação da API",
-            loadingMessage: "A obter informações do vídeo...",
-            errorShortLink: "❌ Links encurtados (vt.tiktok.com ou vm.tiktok.com) não são suportados.\nUtilize o link direto do TikTok: copie a URL pelo navegador, não pela aplicação.\n\nExemplo: https://www.tiktok.com/@usuario/video/123456789",
-            errorInvalidUrl: "URL inválida. Cole um link válido do TikTok.",
-            errorFetchInfo: "Falha ao obter informações do vídeo.",
-            errorDownloadVideo: "Erro ao descarregar vídeo: ",
-            errorDownloadAudio: "Erro ao descarregar áudio: ",
-            chooseFormat: "Escolha o formato:",
-            videoBtn: "Vídeo (MP4)",
-            audioBtn: "Áudio (MP3)",
-            processing: "A processar...",
-            downloadingVideo: "A descarregar...",
-            processingAudio: "A processar áudio...",
-            previewTitle: "Escolha o formato:",
-            errorNetwork: "Erro de rede. Verifique a sua ligação à internet.",
-        },
-        fr: {
-            siteTitle: "TikTok Downloader",
-            siteDescription: "Téléchargez des vidéos sans filigrane · Rapide et gratuit",
-            labelUrl: "URL TikTok",
-            labelVideoQuality: "Qualité vidéo",
-            labelAudioQuality: "Qualité audio",
-            btnDownloadText: "Télécharger maintenant",
-            footerText: "Vidéo téléchargée directement depuis le CDN de TikTok. Respectez les droits d'auteur.",
-            apiDocsText: "Documentation API",
-            loadingMessage: "Recherche des informations sur la vidéo...",
-            errorShortLink: "❌ Les liens raccourcis (vt.tiktok.com ou vm.tiktok.com) ne sont pas pris en charge.\nUtilisez le lien direct TikTok : copiez l'URL depuis le navigateur, pas depuis l'application.\n\nExemple : https://www.tiktok.com/@utilisateur/video/123456789",
-            errorInvalidUrl: "URL invalide. Collez un lien TikTok valide.",
-            errorFetchInfo: "Échec de l'obtention des informations sur la vidéo.",
-            errorDownloadVideo: "Erreur lors du téléchargement de la vidéo : ",
-            errorDownloadAudio: "Erreur lors du téléchargement de l'audio : ",
-            chooseFormat: "Choisissez le format :",
-            videoBtn: "Vidéo (MP4)",
-            audioBtn: "Audio (MP3)",
-            processing: "Traitement en cours...",
-            downloadingVideo: "Téléchargement...",
-            processingAudio: "Traitement audio...",
-            previewTitle: "Choisissez le format :",
-            errorNetwork: "Erreur réseau. Vérifiez votre connexion Internet.",
-        },
-        es: {
-            siteTitle: "TikTok Downloader",
-            siteDescription: "Descarga vídeos sin marca de agua · Rápido y gratis",
-            labelUrl: "URL de TikTok",
-            labelVideoQuality: "Calidad de vídeo",
-            labelAudioQuality: "Calidad de audio",
-            btnDownloadText: "Descargar ahora",
-            footerText: "Vídeo descargado directamente desde el CDN de TikTok. Respeta los derechos de autor.",
-            apiDocsText: "Documentación API",
-            loadingMessage: "Buscando información del vídeo...",
-            errorShortLink: "❌ Los enlaces acortados (vt.tiktok.com o vm.tiktok.com) no son compatibles.\nUsa el enlace directo de TikTok: copia la URL desde el navegador, no desde la aplicación.\n\nEjemplo: https://www.tiktok.com/@usuario/video/123456789",
-            errorInvalidUrl: "URL inválida. Pega un enlace válido de TikTok.",
-            errorFetchInfo: "Error al obtener información del vídeo.",
-            errorDownloadVideo: "Error al descargar vídeo: ",
-            errorDownloadAudio: "Error al descargar audio: ",
-            chooseFormat: "Elige el formato:",
-            videoBtn: "Vídeo (MP4)",
-            audioBtn: "Audio (MP3)",
-            processing: "Procesando...",
-            downloadingVideo: "Descargando...",
-            processingAudio: "Procesando audio...",
-            previewTitle: "Elige el formato:",
-            errorNetwork: "Error de red. Verifica tu conexión a Internet.",
-        },
-        de: {
-            siteTitle: "TikTok Downloader",
-            siteDescription: "Laden Sie Videos ohne Wasserzeichen herunter · Schnell und kostenlos",
-            labelUrl: "TikTok-URL",
-            labelVideoQuality: "Videoqualität",
-            labelAudioQuality: "Audioqualität",
-            btnDownloadText: "Jetzt herunterladen",
-            footerText: "Video direkt von TikTok CDN heruntergeladen. Respektieren Sie das Urheberrecht.",
-            apiDocsText: "API-Dokumentation",
-            loadingMessage: "Suche nach Videoinformationen...",
-            errorShortLink: "❌ Gekürzte Links (vt.tiktok.com oder vm.tiktok.com) werden nicht unterstützt.\nVerwenden Sie den direkten TikTok-Link: Kopieren Sie die URL aus dem Browser, nicht aus der App.\n\nBeispiel: https://www.tiktok.com/@benutzer/video/123456789",
-            errorInvalidUrl: "Ungültige URL. Fügen Sie einen gültigen TikTok-Link ein.",
-            errorFetchInfo: "Fehler beim Abrufen der Videoinformationen.",
-            errorDownloadVideo: "Fehler beim Herunterladen des Videos: ",
-            errorDownloadAudio: "Fehler beim Herunterladen des Audios: ",
-            chooseFormat: "Wählen Sie das Format:",
-            videoBtn: "Video (MP4)",
-            audioBtn: "Audio (MP3)",
-            processing: "Verarbeitung...",
-            downloadingVideo: "Herunterladen...",
-            processingAudio: "Audio wird verarbeitet...",
-            previewTitle: "Wählen Sie das Format:",
-            errorNetwork: "Netzwerkfehler. Überprüfen Sie Ihre Internetverbindung.",
-        }
-    };
-
-    let currentLanguage = localStorage.getItem('language') || 'pt-br';
-
-    function updateLanguage() {
-        const t = translations[currentLanguage];
-        if (!t) return;
-        document.getElementById('siteTitle').innerText = t.siteTitle;
-        document.getElementById('siteDescription').innerText = t.siteDescription;
-        document.getElementById('labelUrl').innerHTML = `<i class="fab fa-tiktok"></i> ${t.labelUrl}`;
-        document.getElementById('labelVideoQuality').innerHTML = `<i class="fas fa-video"></i> ${t.labelVideoQuality}`;
-        document.getElementById('labelAudioQuality').innerHTML = `<i class="fas fa-music"></i> ${t.labelAudioQuality}`;
-        document.getElementById('btnDownloadText').innerText = t.btnDownloadText;
-        document.getElementById('footerText').innerText = t.footerText;
-        document.getElementById('apiDocsText').innerText = t.apiDocsText;
-        // Atualizar placeholder do input
-        videoUrlInput.placeholder = "https://www.tiktok.com/@usuario/video/123456789";
-        // Salvar no localStorage
-        localStorage.setItem('language', currentLanguage);
-    }
-
-    function applyLanguage() {
-        currentLanguage = document.getElementById('languageSelect').value;
-        updateLanguage();
-        // Recarregar mensagens de erro/loading que possam estar visíveis? Não necessário, mas pode-se reexibir.
-        // Se houver resultado na tela, mantém o mesmo texto (não traduz automaticamente).
-    }
-
-    document.getElementById('languageSelect').value = currentLanguage;
-    updateLanguage();
-    document.getElementById('languageSelect').addEventListener('change', applyLanguage);
-
-    // ========== SISTEMA DE TEMAS (já existente) ==========
-    const themes = { ... }; // (mantido igual ao original, omitido por brevidade, mas assume-se que existe)
-    // Para economizar espaço, incluirei o objeto themes original resumido? O código original já o tem.
-    // Como o usuário forneceu o código completo, vou manter a definição original de themes.
-    // Na resposta final, incluirei o objeto themes completo para não quebrar.
-    // (Devido ao limite de tokens, vou assumir que o themes está presente – no código final será inserido integralmente.)
-    // Por segurança, replico o objeto themes do código original aqui (mas compactado).
+    // ========== SISTEMA DE TEMAS (mantido igual) ==========
     const themes = {
         dark: { bodyBg: "#0f172a", containerBg: "rgba(30, 41, 59, 0.85)", cardBg: "#1e293b", textPrimary: "#f1f5f9", textSecondary: "#cbd5e1", inputBg: "#334155", inputBorder: "#475569", inputText: "#f1f5f9", buttonBg: "linear-gradient(95deg, #ff3b6f, #fd1d1d)", buttonText: "white", borderLight: "#334155", resultBg: "#1e293b", resultText: "#f1f5f9", errorBg: "#7f1a1a", errorText: "#fecaca", loadingBg: "#1e293b", loadingText: "#f1f5f9" },
         light: { bodyBg: "#e2e8f0", containerBg: "rgba(255, 255, 255, 0.9)", cardBg: "#ffffff", textPrimary: "#0f172a", textSecondary: "#334155", inputBg: "#f1f5f9", inputBorder: "#cbd5e1", inputText: "#0f172a", buttonBg: "linear-gradient(95deg, #ff3b6f, #fd1d1d)", buttonText: "white", borderLight: "#e2e8f0", resultBg: "#ffffff", resultText: "#0f172a", errorBg: "#fee2e2", errorText: "#b91c1c", loadingBg: "#ffffff", loadingText: "#0f172a" },
@@ -649,35 +628,20 @@
         mainCard.style.color = theme.textPrimary;
         mainCard.style.boxShadow = "0 15px 35px rgba(0,0,0,0.2)";
         const wrappers = document.querySelectorAll('.input-wrapper');
-        wrappers.forEach(w => {
-            w.style.backgroundColor = theme.inputBg;
-            w.style.borderColor = theme.inputBorder;
-            w.style.color = theme.inputText;
-        });
+        wrappers.forEach(w => { w.style.backgroundColor = theme.inputBg; w.style.borderColor = theme.inputBorder; w.style.color = theme.inputText; });
         const selects = document.querySelectorAll('select');
-        selects.forEach(s => {
-            s.style.backgroundColor = theme.inputBg;
-            s.style.color = theme.inputText;
-        });
+        selects.forEach(s => { s.style.backgroundColor = theme.inputBg; s.style.color = theme.inputText; });
         const textInputs = document.querySelectorAll('input');
-        textInputs.forEach(i => {
-            i.style.color = theme.inputText;
-        });
+        textInputs.forEach(i => { i.style.color = theme.inputText; });
         const btn = document.querySelector('.btn-download');
-        if (btn) {
-            btn.style.background = theme.buttonBg;
-            btn.style.color = theme.buttonText;
-        }
+        btn.style.background = theme.buttonBg;
+        btn.style.color = theme.buttonText;
         const apiBtn = document.querySelector('.btn-api-float');
-        if (apiBtn) {
-            apiBtn.style.backgroundColor = "rgba(0,0,0,0.7)";
-            apiBtn.style.color = "white";
-        }
+        apiBtn.style.backgroundColor = "rgba(0,0,0,0.7)";
+        apiBtn.style.color = "white";
         const themeBtn = document.querySelector('.theme-toggle');
-        if (themeBtn) {
-            themeBtn.style.backgroundColor = "rgba(0,0,0,0.7)";
-            themeBtn.style.color = "white";
-        }
+        themeBtn.style.backgroundColor = "rgba(0,0,0,0.7)";
+        themeBtn.style.color = "white";
         document.documentElement.style.setProperty('--result-bg', theme.resultBg);
         document.documentElement.style.setProperty('--result-text', theme.resultText);
         document.documentElement.style.setProperty('--error-bg', theme.errorBg);
@@ -686,54 +650,36 @@
         document.documentElement.style.setProperty('--loading-text', theme.loadingText);
         localStorage.setItem('selectedTheme', themeName);
         document.querySelectorAll('.theme-option').forEach(opt => {
-            if (opt.getAttribute('data-theme') === themeName) {
-                opt.classList.add('selected');
-            } else {
-                opt.classList.remove('selected');
-            }
+            if (opt.getAttribute('data-theme') === themeName) opt.classList.add('selected');
+            else opt.classList.remove('selected');
         });
     }
 
     function loadSavedTheme() {
         const saved = localStorage.getItem('selectedTheme');
-        if (saved && themes[saved]) {
-            applyTheme(saved);
-        } else {
-            applyTheme('dark');
-        }
+        if (saved && themes[saved]) applyTheme(saved);
+        else applyTheme('dark');
     }
 
-    themeToggleBtn.addEventListener('click', () => {
-        themePanel.classList.toggle('hidden');
-    });
+    themeToggleBtn.addEventListener('click', () => themePanel.classList.toggle('hidden'));
     document.querySelectorAll('.theme-option').forEach(opt => {
-        opt.addEventListener('click', (e) => {
-            const themeName = opt.getAttribute('data-theme');
-            applyTheme(themeName);
-            themePanel.classList.add('hidden');
-        });
+        opt.addEventListener('click', () => { applyTheme(opt.getAttribute('data-theme')); themePanel.classList.add('hidden'); });
     });
 
-    // ========== FUNCIONALIDADES DA API ==========
+    // ========== FUNCIONALIDADES EXISTENTES (com suporte a tradução) ==========
     if (apiDocsBtn) {
         apiDocsBtn.addEventListener('click', () => window.open(API_DOCS_URL, '_blank'));
     }
 
     function escapeHtml(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
     }
 
-    function showLoading(show, message = null) {
-        const t = translations[currentLanguage];
-        const loadingMsg = message || (t ? t.loadingMessage : "Buscando informações...");
+    function showLoading(show, messageKey = 'loadingInfo', customMsg = null) {
         if (show) {
-            resultArea.innerHTML = `<div class="loading" style="background: var(--loading-bg, #fff); color: var(--loading-text, #000);"><div class="spinner"></div><span>${loadingMsg}</span></div>`;
+            const msg = customMsg || getTranslation(messageKey);
+            resultArea.innerHTML = `<div class="loading" style="background: var(--loading-bg, #fff); color: var(--loading-text, #000);"><div class="spinner"></div><span>${msg}</span></div>`;
         } else {
             if (resultArea.firstChild && resultArea.firstChild.classList && resultArea.firstChild.classList.contains('loading')) {
                 resultArea.innerHTML = '';
@@ -741,15 +687,12 @@
         }
     }
 
-    function showError(message) {
-        resultArea.innerHTML = `<div class="error-message" style="background: var(--error-bg, #fee2e2); color: var(--error-text, #b91c1c);"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
+    function showError(messageKeyOrText, isKey = true) {
+        const msg = isKey ? getTranslation(messageKeyOrText) : messageKeyOrText;
+        resultArea.innerHTML = `<div class="error-message" style="background: var(--error-bg, #fee2e2); color: var(--error-text, #b91c1c);"><i class="fas fa-exclamation-triangle"></i> ${msg}</div>`;
     }
 
     function showPreview(thumbnailUrl, videoTitle, videoDownloadHandler, audioDownloadHandler) {
-        const t = translations[currentLanguage];
-        const chooseFormatText = t ? t.chooseFormat : "Escolha o formato:";
-        const videoBtnText = t ? t.videoBtn : "Vídeo (MP4)";
-        const audioBtnText = t ? t.audioBtn : "Áudio (MP3)";
         resultArea.innerHTML = `
             <div class="result-card" id="resultCard" style="background: var(--result-bg, white); color: var(--result-text, black);">
                 <div class="video-preview">
@@ -758,10 +701,10 @@
                     </div>
                     <div class="info">
                         <h3><i class="fab fa-tiktok"></i> ${escapeHtml(videoTitle)}</h3>
-                        <p><i class="fas fa-download"></i> ${chooseFormatText}</p>
+                        <p><i class="fas fa-download"></i> ${getTranslation('chooseFormat')}</p>
                         <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
-                            <button class="btn-save" id="finalDownloadBtnVideo" style="background: #0f172a; color: white;"><i class="fas fa-video"></i> ${videoBtnText}</button>
-                            <button class="btn-save" id="finalDownloadBtnAudio" style="background: #0f172a; color: white;"><i class="fas fa-music"></i> ${audioBtnText}</button>
+                            <button class="btn-save" id="finalDownloadBtnVideo" style="background: #0f172a; color: white;"><i class="fas fa-video"></i> ${getTranslation('videoBtn')}</button>
+                            <button class="btn-save" id="finalDownloadBtnAudio" style="background: #0f172a; color: white;"><i class="fas fa-music"></i> ${getTranslation('audioBtn')}</button>
                         </div>
                     </div>
                 </div>
@@ -789,16 +732,15 @@
         if (videoUrl.includes('?')) videoUrl = videoUrl.split('?')[0];
         if (!videoUrl.startsWith('http')) videoUrl = 'https://' + videoUrl;
 
-        const t = translations[currentLanguage];
-        // Verificação de links encurtados com mensagem traduzida
+        // Verificação de links encurtados (mensagem traduzida)
         if (videoUrl.includes('vt.tiktok.com') || videoUrl.includes('vm.tiktok.com')) {
-            showError(t ? t.errorShortLink : '❌ Links encurtados não são suportados.');
+            showError('errorShortLink');
             return;
         }
 
         const tiktokRegex = /^(https?:\/\/)?((www|vm|vt)\.)?tiktok\.com\/(@[\w.]+|t\/[\w]+|embed|v\/\d+|\w+)/i;
         if (!tiktokRegex.test(videoUrl)) {
-            showError(t ? t.errorInvalidUrl : 'URL inválida.');
+            showError('errorInvalidUrl');
             return;
         }
 
@@ -807,7 +749,7 @@
 
         showLoading(true);
         downloadBtn.disabled = true;
-        downloadBtn.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> ${t ? t.processing : 'Processando...'}`;
+        downloadBtn.querySelector('span').innerText = getTranslation('processing');
 
         try {
             const infoEndpoint = `${API_BASE_URL}/info?url=${encodeURIComponent(videoUrl)}`;
@@ -822,10 +764,7 @@
 
             const videoDownloadHandler = async () => {
                 const btn = document.getElementById('finalDownloadBtnVideo');
-                if (btn) {
-                    btn.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> ${t ? t.downloadingVideo : 'Baixando...'}`;
-                    btn.disabled = true;
-                }
+                if (btn) { btn.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> ${getTranslation('loadingDownload')}`; btn.disabled = true; }
                 try {
                     const response = await fetch(`${API_BASE_URL}/download/video`, {
                         method: 'POST',
@@ -844,21 +783,15 @@
                     document.body.removeChild(a);
                     URL.revokeObjectURL(blobUrl);
                 } catch (err) {
-                    showError(`${t ? t.errorDownloadVideo : 'Erro ao baixar vídeo: '}${err.message}`);
+                    showError(getTranslation('errorDownloadVideo') + err.message, false);
                 } finally {
-                    if (btn) {
-                        btn.innerHTML = `<i class="fas fa-video"></i> ${t ? t.videoBtn : 'Vídeo (MP4)'}`;
-                        btn.disabled = false;
-                    }
+                    if (btn) { btn.innerHTML = `<i class="fas fa-video"></i> ${getTranslation('videoBtn')}`; btn.disabled = false; }
                 }
             };
 
             const audioDownloadHandler = async () => {
                 const btn = document.getElementById('finalDownloadBtnAudio');
-                if (btn) {
-                    btn.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> ${t ? t.processingAudio : 'Processando áudio...'}`;
-                    btn.disabled = true;
-                }
+                if (btn) { btn.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> ${getTranslation('loadingAudio')}`; btn.disabled = true; }
                 try {
                     const response = await fetch(`${API_BASE_URL}/download/audio`, {
                         method: 'POST',
@@ -877,12 +810,9 @@
                     document.body.removeChild(a);
                     URL.revokeObjectURL(blobUrl);
                 } catch (err) {
-                    showError(`${t ? t.errorDownloadAudio : 'Erro ao baixar áudio: '}${err.message}`);
+                    showError(getTranslation('errorDownloadAudio') + err.message, false);
                 } finally {
-                    if (btn) {
-                        btn.innerHTML = `<i class="fas fa-music"></i> ${t ? t.audioBtn : 'Áudio (MP3)'}`;
-                        btn.disabled = false;
-                    }
+                    if (btn) { btn.innerHTML = `<i class="fas fa-music"></i> ${getTranslation('audioBtn')}`; btn.disabled = false; }
                 }
             };
 
@@ -890,11 +820,11 @@
 
         } catch (err) {
             console.error(err);
-            showError(err.message || (t ? t.errorFetchInfo : 'Falha ao obter informações do vídeo.'));
+            showError('errorFetch');
         } finally {
             showLoading(false);
             downloadBtn.disabled = false;
-            downloadBtn.innerHTML = `<i class="fas fa-cloud-download-alt"></i> ${t ? t.btnDownloadText : 'Baixar agora'}`;
+            downloadBtn.querySelector('span').innerText = getTranslation('downloadBtn');
         }
     }
 
@@ -902,6 +832,23 @@
     videoUrlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') iniciarProcessamento(); });
     videoUrlInput.addEventListener('focus', () => { if (resultArea.innerHTML.includes('error-message')) resultArea.innerHTML = ''; });
 
+    // Inicializar idioma salvo
+    const savedLang = localStorage.getItem('selectedLanguage');
+    if (savedLang && translations[savedLang]) {
+        currentLang = savedLang;
+        languageSelect.value = savedLang;
+        applyLanguage(savedLang);
+    } else {
+        applyLanguage('pt-br');
+        languageSelect.value = 'pt-br';
+    }
+
+    languageSelect.addEventListener('change', (e) => {
+        applyLanguage(e.target.value);
+        // Recarregar possíveis mensagens de erro ou preview ativo? Não é necessário, apenas novos textos.
+    });
+
+    // Inicializar tema salvo
     loadSavedTheme();
 </script>
 </body>
