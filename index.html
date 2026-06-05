@@ -448,7 +448,7 @@
 
 <script>
     // ============================================================
-    // TRADUÇÕES
+    // TRADUÇÕES (sem o texto de erro para links encurtados)
     // ============================================================
     const translations = {
         'en': {
@@ -467,7 +467,6 @@
             chooseFormat: 'Choose the format:',
             videoBtn: 'Video (MP4)',
             audioBtn: 'Audio (MP3)',
-            errorShortLink: '❌ Short links (vt.tiktok.com or vm.tiktok.com) are not supported.\nUse the direct TikTok URL: copy the link from your browser, not from the app.\n\nExample: https://www.tiktok.com/@user/video/123456789',
             errorInvalidUrl: 'Invalid URL. Please enter a valid TikTok link.',
             errorFetch: 'Failed to get video information.',
             errorDownloadVideo: 'Error downloading video: ',
@@ -491,7 +490,6 @@
             chooseFormat: 'Escolha o formato:',
             videoBtn: 'Vídeo (MP4)',
             audioBtn: 'Áudio (MP3)',
-            errorShortLink: '❌ Links encurtados (vt.tiktok.com ou vm.tiktok.com) não são suportados.\nUse o link direto do TikTok: copie a URL pelo navegador, não pelo aplicativo.\n\nExemplo: https://www.tiktok.com/@usuario/video/123456789',
             errorInvalidUrl: 'URL inválida. Cole um link válido do TikTok.',
             errorFetch: 'Falha ao obter informações do vídeo.',
             errorDownloadVideo: 'Erro ao baixar vídeo: ',
@@ -515,7 +513,6 @@
             chooseFormat: 'Choisissez le format :',
             videoBtn: 'Vidéo (MP4)',
             audioBtn: 'Audio (MP3)',
-            errorShortLink: '❌ Les liens raccourcis (vt.tiktok.com ou vm.tiktok.com) ne sont pas supportés.\nUtilisez le lien direct TikTok : copiez l\'URL depuis votre navigateur, pas depuis l\'application.\n\nExemple : https://www.tiktok.com/@utilisateur/video/123456789',
             errorInvalidUrl: 'URL invalide. Veuillez entrer un lien TikTok valide.',
             errorFetch: 'Échec de la récupération des infos vidéo.',
             errorDownloadVideo: 'Erreur lors du téléchargement de la vidéo : ',
@@ -539,7 +536,6 @@
             chooseFormat: 'Escolha o formato:',
             videoBtn: 'Vídeo (MP4)',
             audioBtn: 'Áudio (MP3)',
-            errorShortLink: '❌ Links encurtados (vt.tiktok.com ou vm.tiktok.com) não são suportados.\nUse o link direto do TikTok: copie a URL pelo navegador, não pela aplicação.\n\nExemplo: https://www.tiktok.com/@utilizador/video/123456789',
             errorInvalidUrl: 'URL inválida. Insira um link válido do TikTok.',
             errorFetch: 'Falha ao obter informações do vídeo.',
             errorDownloadVideo: 'Erro ao descarregar vídeo: ',
@@ -565,8 +561,6 @@
         document.getElementById('downloadBtnText').innerText = t.downloadBtn;
         document.getElementById('apiDocsText').innerText = t.apiDocsBtn;
         document.getElementById('footerText').innerText = t.footer;
-        // Atualizar também textos dinâmicos em elementos que podem ser recriados (botões de preview, loading, error)
-        // As mensagens de erro e loading serão traduzidas no momento da exibição via funções.
         localStorage.setItem('selectedLanguage', lang);
     }
 
@@ -602,7 +596,7 @@
     const inputWrapper = document.getElementById('inputWrapper');
     const languageSelect = document.getElementById('languageSelect');
 
-    // ========== SISTEMA DE TEMAS (mantido igual) ==========
+    // ========== SISTEMA DE TEMAS (mantido) ==========
     const themes = {
         dark: { bodyBg: "#0f172a", containerBg: "rgba(30, 41, 59, 0.85)", cardBg: "#1e293b", textPrimary: "#f1f5f9", textSecondary: "#cbd5e1", inputBg: "#334155", inputBorder: "#475569", inputText: "#f1f5f9", buttonBg: "linear-gradient(95deg, #ff3b6f, #fd1d1d)", buttonText: "white", borderLight: "#334155", resultBg: "#1e293b", resultText: "#f1f5f9", errorBg: "#7f1a1a", errorText: "#fecaca", loadingBg: "#1e293b", loadingText: "#f1f5f9" },
         light: { bodyBg: "#e2e8f0", containerBg: "rgba(255, 255, 255, 0.9)", cardBg: "#ffffff", textPrimary: "#0f172a", textSecondary: "#334155", inputBg: "#f1f5f9", inputBorder: "#cbd5e1", inputText: "#0f172a", buttonBg: "linear-gradient(95deg, #ff3b6f, #fd1d1d)", buttonText: "white", borderLight: "#e2e8f0", resultBg: "#ffffff", resultText: "#0f172a", errorBg: "#fee2e2", errorText: "#b91c1c", loadingBg: "#ffffff", loadingText: "#0f172a" },
@@ -666,7 +660,7 @@
         opt.addEventListener('click', () => { applyTheme(opt.getAttribute('data-theme')); themePanel.classList.add('hidden'); });
     });
 
-    // ========== FUNCIONALIDADES EXISTENTES (com suporte a tradução) ==========
+    // ========== FUNCIONALIDADES ==========
     if (apiDocsBtn) {
         apiDocsBtn.addEventListener('click', () => window.open(API_DOCS_URL, '_blank'));
     }
@@ -732,11 +726,8 @@
         if (videoUrl.includes('?')) videoUrl = videoUrl.split('?')[0];
         if (!videoUrl.startsWith('http')) videoUrl = 'https://' + videoUrl;
 
-        // Verificação de links encurtados (mensagem traduzida)
-        if (videoUrl.includes('vt.tiktok.com') || videoUrl.includes('vm.tiktok.com')) {
-            showError('errorShortLink');
-            return;
-        }
+        // REMOVIDA A VERIFICAÇÃO DE LINKS ENCURTADOS
+        // Agora aceita qualquer URL do TikTok, incluindo vt.tiktok.com e vm.tiktok.com
 
         const tiktokRegex = /^(https?:\/\/)?((www|vm|vt)\.)?tiktok\.com\/(@[\w.]+|t\/[\w]+|embed|v\/\d+|\w+)/i;
         if (!tiktokRegex.test(videoUrl)) {
@@ -845,7 +836,6 @@
 
     languageSelect.addEventListener('change', (e) => {
         applyLanguage(e.target.value);
-        // Recarregar possíveis mensagens de erro ou preview ativo? Não é necessário, apenas novos textos.
     });
 
     // Inicializar tema salvo
